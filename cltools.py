@@ -18,6 +18,8 @@ Usage:
    -p, --parameter [PARAM]          : WRF variable to plot
    -l, --location [LON] [LAT] [HGT] : location and height above ground of the grid 
                                       cell for which to plot the data
+   -r, --radius [RAD]               : radius around the location for which the 
+                                      gridcells are to be analyzed 
    --no-browser                     : the default behavior is to open a browser with the
                                       newly generated visualisation. Set to ignore
                                       and print the path to the html file instead
@@ -33,10 +35,14 @@ def gridcell(args):
         output of sys.args[1:]
     """
 
+    # converts command line arguments paramter, location, raduis if entered as 
+    # '--parameter', '--location', '--radius' to associated shortcut '-p', '-l', '-r' 
     if '--parameter' in args:
         args[args.index('--parameter')] = '-p'
     if '--location' in args:
         args[args.index('--location')] = '-l'
+    if '--radius' in args:
+        args[args.index('--radius')] = '-r'
 
     if len(args) == 0:
         print(HELP)
@@ -45,13 +51,17 @@ def gridcell(args):
     elif args[0] in ['-v', '--version']:
         print('wrfvis_gridcell: ' + wrfvis.__version__)
         print('Licence: public domain')
-        print('wrfvis_gridcell is provided "as is", without warranty of any kind')    
-    elif ('-p' in args) and ('-l' in args):
+        print('wrfvis_gridcell is provided "as is", without warranty of any kind')
+    
+    elif ('-p' in args) and ('-l' in args) and ('-r' in args):
+        # if command line arguments '-p', '-l' and '-r' are entered assign 
+        # the values to variables
         param = args[args.index('-p') + 1]
         lon = float(args[args.index('-l') + 1])
         lat = float(args[args.index('-l') + 2])
         zagl = float(args[args.index('-l') + 3])
-        html_path = wrfvis.write_html(param, lon, lat, zagl)
+        rad = float(args[args.index('-r') + 1])
+        html_path = wrfvis.write_html(param, lon, lat, zagl, rad)
         if '--no-browser' in args:
             print('File successfully generated at: ' + html_path)
         else:
