@@ -112,3 +112,97 @@ def find_nearest_vlevel(ds, gcind, param, ztarget):
     nlhgt = wrf_zagl.to_numpy()[np.arange(len(nlind)), nlind]
 
     return nlind, nlhgt
+
+
+def select_neighboring_gridcells(gcind, rad, lon, lat, ds):
+    """ select direct neighboring grid cells that lie inside the radius of interest around a WRF grid cell
+    
+    Parameters
+    ----------
+    gcind : tuple
+        indeces of WRF grid cell
+    rad : float
+        radius in which the grid cells of interest lie
+    lon : float
+        target longitude
+    lat : float
+        target langitude
+    ds : xarray dataset
+        needs to contain the variables XLONG and XLAT
+
+    Returns
+    -------
+    insiderad : numpy array, integer
+        array with indices of the direct neighboring grid cells that are inside the radius
+    """
+    # indices of all neighboring gridcells
+    neighbor_gcind = np.array([(gcind[0],gcind[1]), (gcind[0]+1, gcind[1]),
+                                (gcind[0]-1, gcind[1]), (gcind[0], gcind[1]+1), 
+                                (gcind[0], gcind[1]-1), (gcind[0]-1, gcind[1]+1), 
+                                (gcind[0]-1, gcind[1]-1), (gcind[0]+1, gcind[1]-1),
+                                (gcind[0]+1,gcind[1]+1)])
+    
+    horizdist = np.zeros(0) # empty array
+    
+    for gcind in neighbor_gcind:
+        # calculate distance between starting point and center of each the gridcell
+        horizdist = np.append(horizdist, haversine(lon, lat, ds.XLONG[0, gcind[0], gcind[1]].data,
+                                                   ds.XLAT[0, gcind[0], gcind[1]].data))
+    
+    # select gridcells that are inside the radius
+    insiderad = neighbor_gcind[horizdist <= rad] 
+    
+    return insiderad
+
+
+def circle_area(ngcind, ngcdist, rad, lon, lat, ds):
+    """ select all grid cells in a radius around the target location
+    
+
+    Parameters
+    ----------
+    ngcind : tuple
+        indeces of WRF grid cell
+    ngcdist : float
+        distance between nearest grid cell and target location
+    rad : float
+        radius in which the grid cells of interest lie
+    lon : float
+        target longitude
+    lat : float
+        target langitude
+    ds : xarray dataset
+        needs to contain the variables XLONG and XLAT
+
+    Raises
+    ------
+    ValueError: 
+        if the radius is smaller than the distance between nearest grid cell and target location
+       
+    Returns
+    -------
+    neighboring_ngcind: 2-dim numpy array, integer
+        array with indices of all the neighboring grid cells inside the radius
+
+    """
+    
+    if rad < ngcdist:
+        raise ValueError('Radius has to be larger than distance between nearest grid cell and target location')
+        
+    else:
+        neighboring_ngcind = select_neighboring_gridcells(ngcind, rad, lon, lat, ds)#define this before use of function???
+        
+        if len(neighboring_ngcind) != len([ngcind]):
+            neighboring_ngcind_old = [ngcind]
+            
+            while len(neighboring_ngcind) != len(neighboring_ngcind_old):
+                neighboring_ngcind_old = neighboring_ngcind
+                for i in neighboring_ngcind_old:
+                    neighboring_ngcind = np.append(neighboring_ngcind_old, select_neighboring_gridcells(i, rad, lon, lat, ds), axis=0)
+                    print(neighboring_ngcind)
+                    neighboring_ngcind = np.unique(neighboring_ngcind, axis=0)
+                
+            return neighboring_ngcind
+        
+        else:
+            return neighboring_ngcind
