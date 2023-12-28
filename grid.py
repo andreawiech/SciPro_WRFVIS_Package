@@ -112,3 +112,44 @@ def find_nearest_vlevel(ds, gcind, param, ztarget):
     nlhgt = wrf_zagl.to_numpy()[np.arange(len(nlind)), nlind]
 
     return nlind, nlhgt
+
+
+def select_neighboring_gridcells(ngcind, rad, lon, lat, ds):
+    """ select gridcells that lie in the radius of interest
+    
+    Parameters
+    ----------
+    ngcind : tuple
+        indeces of a gridcell for that to examine neighbors
+    rad : float
+        radius in which the gridcells of interest lie
+    lon : float
+        target longitude
+    lat : float
+        target langitude
+    ds : xarray dataset
+        needs to contain the variables XLONG and XLAT
+
+    Returns
+    -------
+    insiderad : numpy array, integer
+        index of the neighboring gridcells inside the radius.
+    """
+    # indices of all neighboring gridcells
+    neighbor_ngcind = np.array([(ngcind[0],ngcind[1]), (ngcind[0]+1, ngcind[1]),
+                                (ngcind[0]-1, ngcind[1]), (ngcind[0], ngcind[1]+1), 
+                                (ngcind[0], ngcind[1]-1), (ngcind[0]-1, ngcind[1]+1), 
+                                (ngcind[0]-1, ngcind[1]-1), (ngcind[0]+1, ngcind[1]-1)],
+                                (ngcind[0]+1,ngcind[1]+1))
+    
+    horizdist = np.zeros(0) # empty array
+    
+    for ngcind in neighbor_ngcind:
+        # calculate distance between starting point and center of each the gridcell
+        horizdist = np.append(horizdist, haversine(lon, lat, ds.XLONG[0, ngcind[0], ngcind[1]].data,
+                                                   ds.XLAT[0, ngcind[0], ngcind[1]].data))
+    
+    # select gridcells that are inside the radius
+    insiderad = neighbor_ngcind[horizdist <= rad] 
+    
+    return insiderad
