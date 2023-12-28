@@ -10,7 +10,7 @@ import xarray as xr
 
 from wrfvis import cfg, grid, graphics
 
-def get_wrf_timeseries(param, lon, lat, zagl):
+def get_wrf_timeseries(param, lon, lat, zagl, rad):
     """Read the time series from the WRF output file.
     
     Parameters
@@ -23,6 +23,8 @@ def get_wrf_timeseries(param, lon, lat, zagl):
         the latitude
     zagl : float
         height above ground level
+    rad : float
+        radius in which the gridcells of interest lie
 
     Returns
     -------
@@ -36,12 +38,17 @@ def get_wrf_timeseries(param, lon, lat, zagl):
         # find nearest grid cell
         ngcind, ngcdist = grid.find_nearest_gridcell(
                           ds.XLONG[0,:,:], ds.XLAT[0,:,:], lon, lat)
+        
+        # find sourrounding gridcells
+        insiderad, ngcind, ngcdist = grid.find_sourrounding_gridcells(ds, lat, lon, rad)
+        
         # check if variable is 3 D
         # if dimensions of dataframe variable >= 4
         if len(ds[param].dims)>=4:
+            
             # find nearest vertical level
             nlind, nlhgt = grid.find_nearest_vlevel(
-                           ds[['PHB', 'PH', 'HGT', param]], ngcind, param, zagl)
+                       ds[['PHB', 'PH', 'HGT', param]], ngcind, param, zagl)
 
             # convert binary times to datetime
             wrf_time = pd.to_datetime(
@@ -52,12 +59,36 @@ def get_wrf_timeseries(param, lon, lat, zagl):
 
             # extract time series
             if param == 'T':
-                # WRF output is perturbation potential temperature
-                vararray = ds[param][np.arange(len(ds.Time)), nlind, ngcind[0], ngcind[1]] + 300
+                # WRF output is perturbation potential temperature -> add 300 to get potential Temperature
+                # create an array with values equal to zero 
+                # with shape number of grids inside radius x 36 (time) x 36 (bottom_top)
+                vararray = np.zeros((len(insiderad),36,36))
+                n = 0
+                # Loop to write values of each grid in an array
+                for i in insiderad:
+                    vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]] + 300
+                    n = n+1
             else:
-                vararray = ds[param][np.arange(len(ds.Time)), nlind, ngcind[0], ngcind[1]]
+                # for all other 4-dim variables 
+                vararray = np.zeros((len(insiderad),36,36))
+                n = 0
+
+                for i in insiderad:
+                    vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
+                    n = n+1
+                    
+            # write for each Grid the variables at hight level 0 to one DataFrame
+            df = pd.DataFrame()
+            col_names = ["Grid1","Grid2","Grid3","Grid4","Grid5","Grid6","Grid7","Grid8"] 
             
-            df = vararray[:,0].to_dataframe()
+            for i in range(len(insiderad)):
+                dfx = pd.DataFrame(data=vararray[i,:,0],
+                                   index=["1","2", "3","4","5","6","7","8","9","10"
+                                          ,"11","12","13","14","15","16","17","18","19","20"
+                                          ,"21","22","23","24","25","26","27","28","29","30"
+                                          ,"31","32","33","34","35","36"], 
+                                   columns=[col_names[i]], dtype=None, copy=None)
+                df = pd.concat([df,dfx],axis=1)
 
             # add information about the variable
             df.attrs['variable_name'] = param
@@ -81,10 +112,26 @@ def get_wrf_timeseries(param, lon, lat, zagl):
         ds = ds.assign_coords({'Time': wrf_time})
 
         # extract time series
-        vararray = ds[param][np.arange(len(ds.Time)), ngcind[0], ngcind[1]]
-        
+        vararray = np.zeros((len(insiderad),36,36))
+        n = 0
+
+        for i in insiderad:
+            vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
+            n = n+1
+            
         #df = vararray[:,0].to_dataframe()
-        df = vararray[:].to_dataframe()
+        df = pd.DataFrame()
+        col_names = ["Grid1","Grid2","Grid3","Grid4","Grid5","Grid6","Grid7","Grid8"] 
+        
+        for i in range(len(insiderad)):
+            dfx = pd.DataFrame(data=vararray[i,:,0],
+                               index=["1","2", "3","4","5","6","7","8","9","10"
+                                      ,"11","12","13","14","15","16","17","18","19","20"
+                                      ,"21","22","23","24","25","26","27","28","29","30"
+                                      ,"31","32","33","34","35","36"], 
+                               columns=[col_names[i]], dtype=None, copy=None)
+            df = pd.concat([df,dfx],axis=1)
+            
         # add information about the variable
         df.attrs['variable_name'] = param
         df.attrs['variable_units'] = ds[param].units
@@ -125,7 +172,7 @@ def mkdir(path, reset=False):
     return path
 
 
-def write_html(param, lon, lat, zagl, directory=None):
+def write_html(param, lon, lat, zagl, rad, directory=None):
     """ Create HTML with WRF plot 
     
     Returns
@@ -141,7 +188,7 @@ def write_html(param, lon, lat, zagl, directory=None):
 
     # extract timeseries from WRF output
     print('Extracting timeseries at nearest grid cell')
-    df, hgt = get_wrf_timeseries(param, lon, lat, zagl)
+    df, hgt = get_wrf_timeseries(param, lon, lat, zagl, rad)
    
     print('Plotting data')
     # plot the timeseries
