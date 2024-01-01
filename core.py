@@ -16,7 +16,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
     Parameters
     ----------
     param: str
-        WRF output variable (only 3D variables implemented so far)
+        WRF output variable
     lon : float
         the longitude
     lat : float
@@ -39,11 +39,11 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
         ngcind, ngcdist = grid.find_nearest_gridcell(
                           ds.XLONG[0,:,:], ds.XLAT[0,:,:], lon, lat)
         
-        # find sourrounding gridcells
-        insiderad, ngcind, ngcdist = grid.find_sourrounding_gridcells(ds, lat, lon, rad)
+        # find grid cells that lie inside specified radius
+        gcind_inrad = grid.find_grid_cells_in_radius(ngcind, ngcdist, rad, lon, lat, ds)
         
-        # check if variable is 3 D
-        # if dimensions of dataframe variable >= 4
+        # check if variable is 3-dim
+        # variable is 3-dim if dimensions of dataframe variable >= 4
         if len(ds[param].dims)>=4:
             
             # find nearest vertical level
@@ -59,29 +59,33 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
 
             # extract time series
             if param == 'T':
-                # WRF output is perturbation potential temperature -> add 300 to get potential Temperature
+                # for 3-dim varibale T (perturbation potential Temperature) add 300 to get potential Temperature
                 # create an array with values equal to zero 
                 # with shape number of grids inside radius x 36 (time) x 36 (bottom_top)
-                vararray = np.zeros((len(insiderad),36,36))
+                vararray = np.zeros((len(gcind_inrad),36,36))
                 n = 0
                 # Loop to write values of each grid in an array
-                for i in insiderad:
+                for i in gcind_inrad:
                     vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]] + 300
-                    n = n+1
+                    n =+ 1
             else:
                 # for all other 4-dim variables 
-                vararray = np.zeros((len(insiderad),36,36))
+                vararray = np.zeros((len(gcind_inrad),36,36))
                 n = 0
 
-                for i in insiderad:
+                for i in gcind_inrad:
                     vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
-                    n = n+1
-                    
+                    n =+ 1
+            
+            # create column lables needed for DataFrame
+            col_names = []
+            for i in range(len(gcind_inrad)):
+                col_names = col_names + [f'Grid{i}'] 
+                
             # write for each Grid the variables at hight level 0 to one DataFrame
             df = pd.DataFrame()
-            col_names = ["Grid1","Grid2","Grid3","Grid4","Grid5","Grid6","Grid7","Grid8"] 
             
-            for i in range(len(insiderad)):
+            for i in range(len(gcind_inrad)):
                 dfx = pd.DataFrame(data=vararray[i,:,0],
                                    index=["1","2", "3","4","5","6","7","8","9","10"
                                           ,"11","12","13","14","15","16","17","18","19","20"
@@ -104,6 +108,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
             wrf_hgt = ds.HGT[0,:,:]
             return df, wrf_hgt
             
+        # if variable is not 2D
         # convert binary times to datetime
         wrf_time = pd.to_datetime(
                    [bytes.decode(time) for time in ds.Times.data], 
@@ -112,18 +117,22 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
         ds = ds.assign_coords({'Time': wrf_time})
 
         # extract time series
-        vararray = np.zeros((len(insiderad),36,36))
+        vararray = np.zeros((len(gcind_inrad),36,36))
         n = 0
 
-        for i in insiderad:
+        for i in gcind_inrad:
             vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
-            n = n+1
-            
-        #df = vararray[:,0].to_dataframe()
+            n =+ 1
+         
+        # create column lables needed for DataFrame
+        col_names = []
+        for i in range(len(gcind_inrad)):
+             col_names = col_names + [f'Grid{i}']   
+         
+        # write for each Grid the variables at hight level 0 to one DataFrame
         df = pd.DataFrame()
-        col_names = ["Grid1","Grid2","Grid3","Grid4","Grid5","Grid6","Grid7","Grid8"] 
         
-        for i in range(len(insiderad)):
+        for i in range(len(gcind_inrad)):
             dfx = pd.DataFrame(data=vararray[i,:,0],
                                index=["1","2", "3","4","5","6","7","8","9","10"
                                       ,"11","12","13","14","15","16","17","18","19","20"
