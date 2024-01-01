@@ -114,7 +114,7 @@ def find_nearest_vlevel(ds, gcind, param, ztarget):
     return nlind, nlhgt
 
 
-def select_neighboring_gridcells(gcind, rad, lon, lat, ds):
+def find_direct_neighbors(gcind, rad, lon, lat, ds):
     """ select direct neighboring grid cells that lie inside the radius of interest around a WRF grid cell
     
     Parameters
@@ -155,7 +155,7 @@ def select_neighboring_gridcells(gcind, rad, lon, lat, ds):
     return insiderad
 
 
-def circle_area(ngcind, ngcdist, rad, lon, lat, ds):
+def find_grid_cells_in_radius(ngcind, ngcdist, rad, lon, lat, ds):
     """ select all grid cells in a radius around the target location
     
 
@@ -190,7 +190,7 @@ def circle_area(ngcind, ngcdist, rad, lon, lat, ds):
         raise ValueError('Radius has to be larger than distance between nearest grid cell and target location')
         
     else:
-        neighboring_ngcind = select_neighboring_gridcells(ngcind, rad, lon, lat, ds)#define this before use of function???
+        neighboring_ngcind = find_direct_neighbors(ngcind, rad, lon, lat, ds)
         
         if len(neighboring_ngcind) != len([ngcind]):
             neighboring_ngcind_old = [ngcind]
@@ -198,8 +198,7 @@ def circle_area(ngcind, ngcdist, rad, lon, lat, ds):
             while len(neighboring_ngcind) != len(neighboring_ngcind_old):
                 neighboring_ngcind_old = neighboring_ngcind
                 for i in neighboring_ngcind_old:
-                    neighboring_ngcind = np.append(neighboring_ngcind_old, select_neighboring_gridcells(i, rad, lon, lat, ds), axis=0)
-                    print(neighboring_ngcind)
+                    neighboring_ngcind = np.append(neighboring_ngcind_old, find_direct_neighbors(i, rad, lon, lat, ds), axis=0)
                     neighboring_ngcind = np.unique(neighboring_ngcind, axis=0)
                 
             return neighboring_ngcind
