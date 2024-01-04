@@ -30,9 +30,16 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
     -------
     df_skewT: pd.DataFrame 
         timeseries variables of the vertical profile with additional attributes (grid cell lon, lat, dist, ...)
-    LCL: pressure and temperature value
-    LFC : preesure and Temperature value
-    Zlev : the height 
+   lcl_pressure : float
+        Pressure (hPa) at the Lifted Condensation Level (LCL).
+    lcl_temperature : float
+        Temperature (°C) at the Lifted Condensation Level (LCL).
+    lfc_pressure : float
+        Pressure (hPa) at the Level of Free Convection (LFC).
+    lfc_temperature : float
+        Temperature (°C) at the Level of Free Convection (LFC).
+    zlev : array
+        Altitude values (in meters).
     """
     with xr.open_dataset(cfg.wrfout) as ds:
         ngcind, ngcdist = grid.find_nearest_gridcell(
@@ -128,9 +135,9 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
         Pressure (hPa) at the Level of Free Convection (LFC).
     lfc_temperature : float
         Temperature (°C) at the Level of Free Convection (LFC).
-    water_vapor : numpy.ndarray
+    water_vapor : pandas dataframe
         Water vapor values.
-    zlev : numpy.ndarray
+    zlev : array
         Altitude values (in meters).
     filepath : str, optional
         Filepath to save the plot. If not provided, the plot will be displayed but not saved.
