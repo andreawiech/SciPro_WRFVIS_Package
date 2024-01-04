@@ -27,22 +27,21 @@ def skewT_dataframe(lon,lat,time_index):
     
     Parameters
     ----------
-    param: str
-        WRF output variable (only 3D variables implemented so far)
     lon : float
         the longitude
     lat : float
         the latitude
-    time_index : integer
-        hour after model run (0-35)   
+    time_index: int
+        the time for extraction of vertical profile
 
     Returns
     -------
     df_skewT: pd.DataFrame 
-        timeseries variables of the vertical profile with additional attributes 
-        (grid cell lon, lat, dist, ...)
-        
-    """
+        timeseries variables of the vertical profile with additional attributes (grid cell lon, lat, dist, ...)
+    LCL: pressure and temperature value
+    LFC : preesure and Temperature value
+    Zlev : the height 
+    """
     with xr.open_dataset(cfg.wrfout) as ds:
         ngcind, ngcdist = grid.find_nearest_gridcell(
                           ds.XLONG[0,:,:], ds.XLAT[0,:,:], lon, lat)
