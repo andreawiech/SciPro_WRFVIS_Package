@@ -1,9 +1,4 @@
 """contains functions to make skewT plots"""
-
-#import os
-#from tempfile import mkdtemp
-#import shutil
-#import sys
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -13,16 +8,13 @@ from matplotlib import dates
 import metpy.calc as mpcalc
 from metpy.units import units
 import metpy
-#import metpy.plots as plots
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
-
 from wrfvis import cfg, grid
-#from datetime import timezone
 
 plt.ioff()
 
-def skewT_dataframe(lon,lat,time_index):
+def skewT_and_MSEplot_dataframe(lon,lat,time_index):
     """Read the time series from the WRF output file.
     
     Parameters
@@ -110,32 +102,63 @@ def skewT_dataframe(lon,lat,time_index):
 
    
 
-def skewT_plot(df_skewT, pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor, zlev,filepath=None): 
+
+def skewT_and_MSEDplot_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor, zlev,filepath=None): 
     ''' plot SkewT and Moist static energy 
 
     Parameters
     ----------
     df_SkewT: pandas dataframe
-        SkewT_and_MSE plot of df_SkewT.vertical_profiles_variables
+          attrs of the df.variabe_names
+    pressure : numpy.ndarray
+        Atmospheric pressure values (in hPa) corresponding to the temperature data.
+    temperature : pandas dataframe
+        Atmospheric temperature values (in °C).
+    dewpoint : pandas dataframe
+        Dewpoint temperature values (in °C).
+    uwind : numpy.ndarray
+        Zonal wind component values.
+    vwind : pandas dataframe
+        Meridional wind component values.
+    lcl_pressure : float
+        Pressure (hPa) at the Lifted Condensation Level (LCL).
+    lcl_temperature : float
+        Temperature (°C) at the Lifted Condensation Level (LCL).
+    lfc_pressure : float
+        Pressure (hPa) at the Level of Free Convection (LFC).
+    lfc_temperature : float
+        Temperature (°C) at the Level of Free Convection (LFC).
+    water_vapor : numpy.ndarray
+        Water vapor values.
+    zlev : numpy.ndarray
+        Altitude values (in meters).
+    filepath : str, optional
+        Filepath to save the plot. If not provided, the plot will be displayed but not saved.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated Matplotlib Figure containing the SkewT and Moist Static Energy Diagrams.
     '''
-    # Plot the Skew-T diagram
-    fig = plt.figure(figsize=(12, 12))
-    skew = SkewT(fig, rotation=45)
+    # Plot the Skew-T diagra
+    fig= plt.figure(figsize=(12, 12))
+    skew= SkewT(fig, rotation=45)
     
     title = ('WRF time series at location {:.2f}$^{{\circ}}$E/{:.2f}$^{{\circ}}$N,'
              + '\nModel initialization time: {:%d %b %Y, %H%M} UTC')
 
-    plt.title(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'], df_skewT.attrs['time'][0] , loc='left'))
+    plt.title(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
     
     # Customize labels
     skew.ax.set_ylabel('Pressure (hPa)')
     skew.ax.set_xlabel('Temperature (°C)')
+    
 
     
     # Plot the temperature
-    skew.plot(pressure, temperature, 'r', label='Temperature')
-    skew.plot(pressure, dewpoint, 'g', label='dewpoint')
-    skew.plot_barbs(pressure, uwind, vwind)
+    skew.plot(pressure,temperature, 'r', label='Temperature')
+    skew.plot(pressure,dewpoint, 'g', label='dewpoint')
+    skew.plot_barbs(pressure,uwind,vwind)
     skew.plot(lcl_pressure, lcl_temperature, 'ko', label='LCL')
     skew.plot(lfc_pressure, lfc_temperature, 'bo', label='LFC')
     # Additional Skew-T features
@@ -144,12 +167,12 @@ def skewT_plot(df_skewT, pressure, temperature, dewpoint, uwind, vwind, lcl_pres
     skew.plot_mixing_lines()
     
     #MSE plots
-    #ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , zlev.values*units.m, h0_std=2000, ensemble_size=20, ent_rate=np.arange(0,2,0.05), entrain=False)
     
+    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , zlev.values*units.m, h0_std=2000, ensemble_size=20, ent_rate=np.arange(0,2,0.05), entrain=False)
+    plt.suptitle(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
+       
     # Show legend
     skew.ax.legend()
-    
-    plt.show()
 
     if filepath is not None:
         plt.savefig(filepath, dpi=150)
@@ -160,5 +183,4 @@ def skewT_plot(df_skewT, pressure, temperature, dewpoint, uwind, vwind, lcl_pres
     print(f"Skew-T plot saved as: {filepath}")  
     return fig
 
-   # Example usage:
-   # skewT_plot(pressure_data, temperature_data, dewpoint_data,
+
