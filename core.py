@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from wrfvis import cfg, grid, graphics
+from wrfvis import cfg, grid, graphics, skewT
 
 def get_wrf_timeseries(param, lon, lat, zagl, rad):
     """Read the time series from the WRF output file.
@@ -32,6 +32,8 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
         timeseries of param with additional attributes (grid cell lon, lat, dist, ...)
     wrf_hgt: xarray DataArray
         WRF topography
+    col_names: list
+        contains column names of all gridcells in the target radius
     """
 
     with xr.open_dataset(cfg.wrfout) as ds:
@@ -67,7 +69,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
                 # Loop to write values of each grid in an array
                 for i in gcind_inrad:
                     vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]] + 300
-                    n =+ 1
+                    n = n + 1
             else:
                 # for all other 4-dim variables 
                 vararray = np.zeros((len(gcind_inrad),36,36))
@@ -75,7 +77,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
 
                 for i in gcind_inrad:
                     vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
-                    n =+ 1
+                    n = n + 1
             
             # create column lables needed for DataFrame
             col_names = []
@@ -99,14 +101,21 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
             df.attrs['variable_units'] = ds[param].units
 
             # add information about the location
-            df.attrs['distance_to_grid_point'] = ngcdist
-            df.attrs['lon_grid_point'] = ds.XLONG.to_numpy()[0, ngcind[0], ngcind[1]]
-            df.attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, ngcind[0], ngcind[1]]
+            # information about location that changes for every gridcell
+            n = 0
+            for i in col_names:
+                df[i].attrs['distance_to_grid_point'] = grid.haversine(lon,lat,
+                                                                       ds.XLONG[0,gcind_inrad[n,0],gcind_inrad[n,1]],
+                                                                       ds.XLAT[0,gcind_inrad[n,0],gcind_inrad[n,1]])
+                df[i].attrs['lon_grid_point'] = ds.XLONG.to_numpy()[0,gcind_inrad[n,0],gcind_inrad[n,1]]
+                df[i].attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, gcind_inrad[n,0], gcind_inrad[n,1]]
+                n = n + 1
+            # information about location that stays the same for all gridcells
             df.attrs['grid_point_elevation_time0'] = nlhgt[0]
             
             # terrain elevation
             wrf_hgt = ds.HGT[0,:,:]
-            return df, wrf_hgt
+            return df, wrf_hgt, col_names
             
         # if variable is not 2D
         # convert binary times to datetime
@@ -122,7 +131,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
 
         for i in gcind_inrad:
             vararray[n] = ds[param][np.arange(len(ds.Time)), nlind, i[0], i[1]]
-            n =+ 1
+            n = n + 1
          
         # create column lables needed for DataFrame
         col_names = []
@@ -146,14 +155,22 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad):
         df.attrs['variable_units'] = ds[param].units
 
         # add information about the location
-        df.attrs['distance_to_grid_point'] = ngcdist
-        df.attrs['lon_grid_point'] = ds.XLONG.to_numpy()[0, ngcind[0], ngcind[1]]
-        df.attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, ngcind[0], ngcind[1]]
+        # information about location that changes for every gridcell
+        n = 0
+        for i in col_names:
+            df[i].attrs['distance_to_grid_point'] = grid.haversine(lon,lat,
+                                                                   ds.XLONG[0,gcind_inrad[n,0],gcind_inrad[n,1]],
+                                                                   ds.XLAT[0,gcind_inrad[n,0],gcind_inrad[n,1]])
+            df[i].attrs['lon_grid_point'] = ds.XLONG.to_numpy()[0,gcind_inrad[n,0],gcind_inrad[n,1]]
+            df[i].attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, gcind_inrad[n,0], gcind_inrad[n,1]]
+            n = n + 1
+        # information about location that stays the same for all gridcells
+        df.attrs['grid_point_elevation_time0'] = nlhgt[0]
         
         # terrain elevation
         wrf_hgt = ds.HGT[0,:,:]
 
-    return df, wrf_hgt
+    return df, wrf_hgt, col_names
 
 
 def mkdir(path, reset=False):
@@ -222,4 +239,41 @@ def write_html(param, lon, lat, zagl, rad, directory=None):
         with open(outpath, 'w') as outfile:
             outfile.writelines(out)
 
+    return outpath
+
+def skewT_html(lon, lat, time_index, directory=None):
+    """ Create HTML with skewT plot 
+    
+    Returns
+    -------
+    outpath: str
+        path to HTML file
+    """
+    
+    #extract vertical profile for skewT 
+    print('Extracting  vertical profile for skewT')
+    df_skewT, zlev, lcl_pressure, lcl_temperature,lfc_pressure, lfc_temperature = skewT.skewT_dataframe(lon,lat,time_index)
+    
+    # plot the skewT
+    print('plotting skewT')
+    
+    png = os.path.join('skewT.png')
+    skewT.skewT_plot(df_skewT, df_skewT['P'], df_skewT['Temperature_in_degC'], df_skewT['dewpoint'], df_skewT['U'], df_skewT['V'], lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, df_skewT['QVAPOR'], zlev, filepath ='skewT.png')
+    
+    #create HTML from template
+    outpath = os.path.join(directory, 'index.html')
+    with open(cfg.html_template, 'r') as infile:
+        lines = infile.readlines()
+        out = []
+        for txt in lines:
+            txt = txt.replace('[PLOTTYPE]', 'SkewT-Diagramm')
+            #txt = txt.replace('[PLOTVAR]', param)
+            txt = txt.replace('[IMGTYPE]', 'vertical profile')
+            out.append(txt)
+            
+    
+    with open(outpath, 'w') as outfile:
+        outfile.writelines(out)
+    
+    
     return outpath
