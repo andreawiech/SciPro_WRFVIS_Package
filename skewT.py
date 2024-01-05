@@ -4,10 +4,8 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import dates
-
 import metpy.calc as mpcalc
 from metpy.units import units
-import metpy
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
 from wrfvis import cfg, grid
@@ -103,7 +101,7 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
         lcl_pressure, lcl_temperature = mpcalc.lcl(df_skewT['P'][0]*units('hPa'), actual_temp[0], df_skewT['dewpoint'][0]*units('degC'))
         
         # Calculating the Level of free convection
-        lfc_pressure, lfc_temperature =metpy.calc.lfc(df_skewT['P'].values*units('hPa'), actual_temp, df_skewT['dewpoint'].values*units('degC'))
+        lfc_pressure, lfc_temperature = mpcalc.lfc(df_skewT['P'].values*units('hPa'), actual_temp, df_skewT['dewpoint'].values*units('degC'))
         
     return df_skewT, Zlev,  lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature
 
