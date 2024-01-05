@@ -210,10 +210,10 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
     plt.show() 
     if filepath is not None:
         plt.savefig(filepath, dpi=150)
+        plt.show()
         plt.close()
         
-     # Show the plot
-    plt.show() 
+    
     print(f"Skew-T plot saved as: {filepath}")  
     return fig,ax
 
