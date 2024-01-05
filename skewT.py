@@ -58,11 +58,11 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
             for var_name in variable_names:
                 # extratxting variables with the vertical profile for the skewT
                 if var_name == 'P':
-                    var = (ds.variables[var_name][time_index, :,ngcind[0],ngcind[1]] + ds.variables['PB'][0, :,ngcind[0],ngcind[1]]) * 0.01* units.hPa
+                    var = (ds.variables[var_name][time_index, :,ngcind[1],ngcind[0]] + ds.variables['PB'][0, :,ngcind[1],ngcind[0]]) * 0.01* units.hPa
                 elif var_name == 'T':
-                    var = ds.variables[var_name][time_index,:, ngcind[0],ngcind[1]] + 300
+                    var = ds.variables[var_name][time_index,:, ngcind[1],ngcind[0]] + 300
                 else:
-                    var = ds.variables[var_name][time_index, :, ngcind[0],ngcind[1]]
+                    var = ds.variables[var_name][time_index, :, ngcind[1],ngcind[0]]
                 
                     
                 # Create a DataFrame for the current grid point
@@ -183,12 +183,17 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
     skew.plot_mixing_lines()
     
     # Shade areas of CAPE and CIN
-    skew.shade_cin(pressure.values*units('hPa'), temperature.values*units('degC'), prof.values*units('degC'), dewpoint.values*units('degC'), label ='CIN')
-    skew.shade_cape(pressure.values*units('hPa'),temperature.values*units('degC'), prof.values*units('degC'),label='CAPE')
+    skew.shade_cin(pressure.values*units('hPa'), temperature.values*units('degC'),
+                   prof.values*units('degC'), dewpoint.values*units('degC'), label ='CIN')
+    
+    skew.shade_cape(pressure.values*units('hPa'),temperature.values*units('degC'),
+                    prof.values*units('degC'),label='CAPE')
 
     
     #MSE plots
-    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , zlev.values*units.m, h0_std=2000, ensemble_size=20, ent_rate=np.arange(0,2,0.05), entrain=False)
+    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , 
+                        zlev.values*units.m, h0_std=2000, ensemble_size=20, 
+                        ent_rate=np.arange(0,2,0.05), entrain=False)
     plt.suptitle(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
        
     # Show legend
