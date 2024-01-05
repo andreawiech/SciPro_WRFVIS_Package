@@ -85,32 +85,37 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
               print('choose a time index from 0-35')
                    
         #extracting the hght for the MSE plot
-        Zlev=(ds['PHB'][:, :, ngcind[0], ngcind[1]] + ds['PH'][:, :, ngcind[0], ngcind[1]]) / 9.81
+        Zlev=(ds['PHB'][:,:,ngcind[0],ngcind[1]] + ds['PH'][:,:,ngcind[0],ngcind[1]]) / 9.81
         
         #adding calculations for the LCL,LFC,Temperature_in_degC,dewpoint
         
+        # Calculating the lifting condensation level
+        df_skewT['Pressure'] = np.round(df_skewT['P'].values*units('hPa'),2)
+        
         #calculating and converting actual temperature from potential temperature to celsuis
-        actual_temp = mpcalc.temperature_from_potential_temperature(df_skewT['P'].values*units('hPa'),
+        actual_temp = mpcalc.temperature_from_potential_temperature(df_skewT['P'].values*units('hPa'), 
                                                                     df_skewT['T'].values*units('K'))
-        df_skewT['Temperature_in_degC'] = actual_temp - 273.15*units.K
+        df_skewT['Temperature_in_degC'] = actual_temp.to('degC')
         
         # Calculate dewpoint using specific humidity
-        df_skewT['dewpoint'] = mpcalc.dewpoint_from_specific_humidity(df_skewT['P'].values*units('hPa'), actual_temp, 
+        df_skewT['dewpoint'] = mpcalc.dewpoint_from_specific_humidity(df_skewT['P'].values*units('hPa'),
+                                                                      df_skewT['Temperature_in_degC'].values*units('degC'),
                                                                       df_skewT['QVAPOR'].values * units('kg/kg'))
-
+          
         # Calculate full parcel profile and add to plot as black line
         prof = mpcalc.parcel_profile(df_skewT['P'].values*units('hPa'),
                                                     df_skewT['Temperature_in_degC'][0]*units('degC'),
                                                     df_skewT['dewpoint'][0]*units('degC'))
         
-        df_skewT['profile'] = prof.to('degC') 
-        
+        df_skewT['profile'] = prof.to('degC')    
         # Calculating the lifting condensation level
-        lcl_pressure, lcl_temperature = mpcalc.lcl(df_skewT['P'][0]*units('hPa'),actual_temp[0],
+        lcl_pressure, lcl_temperature = mpcalc.lcl(df_skewT['P'][0]*units('hPa'),
+                                                   df_skewT['Temperature_in_degC'][0]*units('degC'),
                                                    df_skewT['dewpoint'][0]*units('degC'))
         
         # Calculating the Level of free convection
-        lfc_pressure, lfc_temperature = mpcalc.lfc(df_skewT['P'].values*units('hPa'), actual_temp,
+        lfc_pressure, lfc_temperature = mpcalc.lfc(df_skewT['P'].values*units('hPa'),
+                                                   df_skewT['Temperature_in_degC'].values*units('degC'),
                                                    df_skewT['dewpoint'].values*units('degC'))
         
     return df_skewT, Zlev,  lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature
