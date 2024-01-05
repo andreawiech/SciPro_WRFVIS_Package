@@ -55,7 +55,8 @@ req_packages = ['numpy',
                 'matplotlib',
                 'netCDF4',
                 'metpy'
-                'MSEplots']
+                'MSEplots-pkg'
+                'SkewT']
 
 check_dependencies(req_packages)
 
