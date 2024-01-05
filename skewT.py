@@ -90,18 +90,28 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
         #adding calculations for the LCL,LFC,Temperature_in_degC,dewpoint
         
         #calculating and converting actual temperature from potential temperature to celsuis
-        actual_temp = mpcalc.temperature_from_potential_temperature(df_skewT['P'].values*units('hPa'), df_skewT['T'].values*units('K'))
+        actual_temp = mpcalc.temperature_from_potential_temperature(df_skewT['P'].values*units('hPa'),
+                                                                    df_skewT['T'].values*units('K'))
         df_skewT['Temperature_in_degC'] = actual_temp - 273.15*units.K
         
         # Calculate dewpoint using specific humidity
-        df_skewT['dewpoint'] = mpcalc.dewpoint_from_specific_humidity(df_skewT['P'].values*units('hPa'), actual_temp, df_skewT['QVAPOR'].values * units('kg/kg'))
+        df_skewT['dewpoint'] = mpcalc.dewpoint_from_specific_humidity(df_skewT['P'].values*units('hPa'), actual_temp, 
+                                                                      df_skewT['QVAPOR'].values * units('kg/kg'))
+
+        # Calculate full parcel profile and add to plot as black line
+        prof = mpcalc.parcel_profile(df_skewT['P'].values*units('hPa'),
+                                                    df_skewT['Temperature_in_degC'][0]*units('degC'),
+                                                    df_skewT['dewpoint'][0]*units('degC'))
+        
+        df_skewT['profile'] = prof.to('degC') 
         
         # Calculating the lifting condensation level
-
-        lcl_pressure, lcl_temperature = mpcalc.lcl(df_skewT['P'][0]*units('hPa'), actual_temp[0], df_skewT['dewpoint'][0]*units('degC'))
+        lcl_pressure, lcl_temperature = mpcalc.lcl(df_skewT['P'][0]*units('hPa'),actual_temp[0],
+                                                   df_skewT['dewpoint'][0]*units('degC'))
         
         # Calculating the Level of free convection
-        lfc_pressure, lfc_temperature = mpcalc.lfc(df_skewT['P'].values*units('hPa'), actual_temp, df_skewT['dewpoint'].values*units('degC'))
+        lfc_pressure, lfc_temperature = mpcalc.lfc(df_skewT['P'].values*units('hPa'), actual_temp,
+                                                   df_skewT['dewpoint'].values*units('degC'))
         
     return df_skewT, Zlev,  lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature
 
@@ -158,7 +168,8 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
     skew.ax.set_ylabel('Pressure (hPa)')
     skew.ax.set_xlabel('Temperature (°C)')
     
-
+    #parcel Profile
+    skew.plot(pressure.values, prof, 'k', linewidth=2)
     
     # Plot the temperature
     skew.plot(pressure,temperature, 'r', label='Temperature')
@@ -171,8 +182,12 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
     skew.plot_moist_adiabats()
     skew.plot_mixing_lines()
     
-    #MSE plots
+    # Shade areas of CAPE and CIN
+    skew.shade_cin(pressure.values*units('hPa'), temperature.values*units('degC'), prof.values*units('degC'), dewpoint.values*units('degC'), label ='CIN')
+    skew.shade_cape(pressure.values*units('hPa'),temperature.values*units('degC'), prof.values*units('degC'),label='CAPE')
+
     
+    #MSE plots
     ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , zlev.values*units.m, h0_std=2000, ensemble_size=20, ent_rate=np.arange(0,2,0.05), entrain=False)
     plt.suptitle(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
        
