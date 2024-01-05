@@ -302,11 +302,11 @@ def skewT_html(lon, lat, time_index, directory=None):
     
     # plot the skewT
     print('plotting skewT')
-    
-    png = os.path.join('skewT.png')
+    print('MSEplot is saved in current directory')
+    png = os.path.join('MSEplot.png')
     skewT.skewT_and_MSED_plot(df_skewT, df_skewT['P'], df_skewT['Temperature_in_degC'], df_skewT['dewpoint'],
                               df_skewT['U'], df_skewT['V'], lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature,
-                              df_skewT['QVAPOR'], zlev, df_skewT['profile'],filepath ='skewT.png')
+                              df_skewT['QVAPOR'], zlev, df_skewT['profile'],filepath =png)
     
     #create HTML from template
     outpath = os.path.join(directory, 'index.html')
