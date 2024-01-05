@@ -118,7 +118,7 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
    
 
 
-def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor, zlev,filepath=None): 
+def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor,zlev,prof,filepath=None): 
     ''' plot SkewT and Moist static energy 
 
     Parameters
