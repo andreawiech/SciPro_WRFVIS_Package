@@ -9,6 +9,7 @@ from metpy.units import units
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
 from wrfvis import cfg, grid
+import sys
 
 plt.ioff()
 
@@ -83,6 +84,7 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
                 df_skewT.attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, ngcind[0], ngcind[1]]
         except:
               print('choose a time index from 0-35')
+              sys.exit()
                    
         #extracting the hght for the MSE plot
         Zlev=(ds['PHB'][:,:,ngcind[0],ngcind[1]] + ds['PH'][:,:,ngcind[0],ngcind[1]]) / 9.81
