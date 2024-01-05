@@ -163,57 +163,60 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
         The generated Matplotlib Figure containing the SkewT and Moist Static Energy Diagrams.
     '''
    # Plot the Skew-T diagra
-    fig= plt.figure(figsize=(8, 6))
-    skew= SkewT(fig, rotation=45)
-    
+    fig = plt.figure(figsize=(8, 6))
+    skew = SkewT(fig, rotation=45)
+
     title = ('WRF time series at location {:.2f}$^{{\circ}}$E/{:.2f}$^{{\circ}}$N,'
              + '\nModel initialization time: {:%d %b %Y, %H%M} UTC')
 
-    plt.title(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
-    
+    plt.title(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],
+                           df_skewT.attrs['time'][0], loc='left'))
+
     # Customize labels
     skew.ax.set_ylabel('Pressure (hPa)')
     skew.ax.set_xlabel('Temperature (°C)')
-    
-    #parcel Profile
+
+    # Parcel Profile
     skew.plot(pressure.values, prof, 'k', linewidth=2)
-    
+
     # Plot the temperature
-    skew.plot(pressure,temperature, 'r', label='Temperature')
-    skew.plot(pressure,dewpoint, 'g', label='dewpoint')
-    skew.plot_barbs(pressure,uwind,vwind)
+    skew.plot(pressure, temperature, 'r', label='Temperature')
+    skew.plot(pressure, dewpoint, 'g', label='dewpoint')
+    skew.plot_barbs(pressure, uwind, vwind)
     skew.plot(lcl_pressure, lcl_temperature, 'ko', label='LCL')
     skew.plot(lfc_pressure, lfc_temperature, 'bo', label='LFC')
     # Additional Skew-T features
     skew.plot_dry_adiabats()
     skew.plot_moist_adiabats()
     skew.plot_mixing_lines()
-    
-    # Shade areas of CAPE and CIN
-    skew.shade_cin(pressure.values*units('hPa'), temperature.values*units('degC'),
-                   prof.values*units('degC'), dewpoint.values*units('degC'), label ='CIN')
-    
-    skew.shade_cape(pressure.values*units('hPa'),temperature.values*units('degC'),
-                    prof.values*units('degC'),label='CAPE')
 
-    
-    #MSE plots
-    print('plotting MSE')
-    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , 
-                        zlev.values*units.m, h0_std=2000, ensemble_size=20, 
-                        ent_rate=np.arange(0,2,0.05), entrain=False)
-    plt.suptitle(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
-   
-    # Show legend
-    skew.ax.legend()
-    # Show the plot
-    plt.show() 
+    # Shade areas of CAPE and CIN
+    skew.shade_cin(pressure.values * units('hPa'), temperature.values * units('degC'),
+                   prof.values * units('degC'), dewpoint.values * units('degC'), label='CIN')
+
+    skew.shade_cape(pressure.values * units('hPa'), temperature.values * units('degC'),
+                    prof.values * units('degC'), label='CAPE')
+    # Save the Skew-T plot if filepath is provided
     if filepath is not None:
-        plt.savefig(filepath, dpi=150)
+        skewT_filepath = filepath.replace('.png', '_skewT.png')
+        # Show legend
+        skew.ax.legend()
+        plt.savefig(skewT_filepath, dpi=150)
         plt.close()
-        
-     # Show the plot
-    plt.show() 
-    print(f"Skew-T plot saved as: {filepath}")  
-    return fig,ax
+        print(f"Skew-T plot saved as: {skewT_filepath}")
+
+    # Plot the MSE plots
+    print('plotting MSE')
+    fig = plt.figure(figsize=(8, 6))
+    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values,
+                        zlev.values * units.m, h0_std=2000, ensemble_size=20,
+                        ent_rate=np.arange(0, 2, 0.05), entrain=False)
+
+    # Save the MSE plot if filepath is provided
+    if filepath is not None:
+        mse_filepath = filepath.replace('.png', '_MSE.png')  # Modify the filename
+        plt.savefig(mse_filepath, dpi=150)
+        plt.close()
+        print(f"MSE plot saved as: {mse_filepath}")
+    return fig
 
