@@ -1,4 +1,5 @@
 """contains functions to make skewT plots"""
+import sys
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -9,7 +10,6 @@ from metpy.units import units
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
 from wrfvis import cfg, grid
-import sys
 
 plt.ioff()
 
@@ -163,7 +163,7 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
         The generated Matplotlib Figure containing the SkewT and Moist Static Energy Diagrams.
     '''
     # Plot the Skew-T diagra
-    fig= plt.figure(figsize=(12, 12))
+    fig, ax = plt.subplots(figsize=(8, 6))
     skew= SkewT(fig, rotation=45)
     
     title = ('WRF time series at location {:.2f}$^{{\circ}}$E/{:.2f}$^{{\circ}}$N,'
@@ -198,21 +198,23 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
 
     
     #MSE plots
+    print('plotting MSE')
     ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values , 
                         zlev.values*units.m, h0_std=2000, ensemble_size=20, 
                         ent_rate=np.arange(0,2,0.05), entrain=False)
     plt.suptitle(title.format(df_skewT.attrs['lon_grid_point'], df_skewT.attrs['lat_grid_point'],df_skewT.attrs['time'][0] , loc='left'))
-       
+    # Show the plot
+    plt.show() 
     # Show legend
     skew.ax.legend()
 
     if filepath is not None:
         plt.savefig(filepath, dpi=150)
         plt.close()
+        
     # Show the plot
     plt.show()
     
     print(f"Skew-T plot saved as: {filepath}")  
-    return fig
-
+    return fig,ax
 
