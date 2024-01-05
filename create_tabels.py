@@ -186,11 +186,6 @@ def weather_table(lon, lat, ds):
     # Insert headers and rows into the HTML table code
     html_table = html_table.replace("{}", headers, 1).replace("{}", rows, 1)
 
-    # Save HTML table code to a file
-    table_filename = "colored_cells_table.html"
-    with open(table_filename, "w") as file:
-        file.write(html_table)
-
     return html_table
 
 
@@ -304,11 +299,6 @@ def geographical_table(lon, lat, ds):
     html_table2 = (html_table2.replace("{}", headers2, 1).replace("{}",
                                                                   rows2, 1))
 
-    # Save HTML table code to a file
-    table_filename2 = "physical_attributes_table.html"
-    with open(table_filename2, "w") as file:
-        file.write(html_table2)
-
     return html_table2
 
 
@@ -347,7 +337,7 @@ def html_page(html_table, html_table2):
     """
 
     # Save the entire HTML page code to a file
-    html_filename = "combined_page.html"
+    html_filename = "tabels.html"
     with open(html_filename, "w") as file:
         file.write(html_page)
 
