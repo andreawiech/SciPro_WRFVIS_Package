@@ -82,7 +82,7 @@ def skewT_and_MSEplot_dataframe(lon,lat,time_index):
                 df_skewT.attrs['lon_grid_point'] = ds.XLONG.to_numpy()[0, ngcind[0], ngcind[1]]
                 df_skewT.attrs['lat_grid_point'] = ds.XLAT.to_numpy()[0, ngcind[0], ngcind[1]]
         except:
-              print('choose a time index from 0-36')
+              print('choose a time index from 0-35')
                    
         #extracting the hght for the MSE plot
         Zlev=(ds['PHB'][:, :, ngcind[0], ngcind[1]] + ds['PH'][:, :, ngcind[0], ngcind[1]]) / 9.81
