@@ -202,6 +202,7 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
         # Show legend
         skew.ax.legend()
         plt.savefig(skewT_filepath, dpi=150)
+        plt.show()
         plt.close()
         print(f"Skew-T plot saved as: {skewT_filepath}")
 
@@ -216,6 +217,7 @@ def skewT_and_MSED_plot(df_skewT,pressure, temperature, dewpoint, uwind, vwind, 
     if filepath is not None:
         mse_filepath = filepath.replace('.png', '_MSE.png')  # Modify the filename
         plt.savefig(mse_filepath, dpi=150)
+        plt.show()
         plt.close()
         print(f"MSE plot saved as: {mse_filepath}")
     return fig
