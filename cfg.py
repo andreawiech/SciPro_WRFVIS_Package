@@ -4,12 +4,14 @@ import sys
 
 #wrfout = '/home/c707201/temp/WRF_output_project.nc'
 wrfout = r'C:\Users\andre\Downloads\WRF_output_project.nc'
+output_directory = r'C:\Users\mhde\.conda\envs\wissprog\Lib\site-packages\wrfvis'
 
 if os.path.isfile(wrfout):
     
     # location of data directory
     pkgdir = os.path.dirname(__file__)
     html_template = os.path.join(pkgdir, 'data', 'template.html')
+    html_skewT_template = os.path.join(pkgdir, 'data', 'skewT_template.html')  
     test_ts_df = os.path.join(pkgdir, 'data', 'test_df_timeseries.pkl')
     test_hgt = os.path.join(pkgdir, 'data', 'test_hgt.nc')
 
