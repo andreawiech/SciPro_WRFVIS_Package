@@ -1,3 +1,16 @@
+"""
+This script provides functions to generate HTML tables containing weather and geographical information
+for skiing conditions based on WRF (Weather Research and Forecasting) model output.
+
+Authors: Malte Hildebrandt, Joep van Noort
+
+Dependencies:
+- pandas
+- xarray
+- wrfvis package (imported as cfg and snowcheck)
+
+Note: Ensure that the necessary dependencies are installed before running the script.
+"""
 import pandas as pd
 import xarray as xr
 import re
@@ -5,7 +18,7 @@ import re
 from wrfvis import cfg, snowcheck
 
 
-def match_counter(match):
+def get_match_value(match):
     """
     @author: Joep van Noort
 
@@ -66,26 +79,26 @@ def weather_table(lon, lat, ds):
     """
     # create timeseries dataset for weather variables
     timestep = range(36)
-    Time_list = []
-    Snowcover_list = []
-    Snowfall_list = []
-    Sun_list = []
-    Wind_list = []
+    time_list = []
+    snowcover_list = []
+    snowfall_list = []
+    sun_list = []
+    wind_list = []
 
     for i in timestep:
         date = ds['XTIME'][i].values
         time_value = date.astype(str)[5:10] + ' ' + date.astype(str)[11:16]
-        Time_list.append(time_value)
-        Snowcover_list.append(snowcheck.snow_variables(lon, lat, ds, i)[0])
-        Snowfall_list.append(snowcheck.snow_variables(lon, lat, ds, i)[2])
-        Sun_list.append(snowcheck.snow_variables(lon, lat, ds, i)[4])
-        Wind_list.append(snowcheck.snow_variables(lon, lat, ds, i)[6])
+        time_list.append(time_value)
+        snowcover_list.append(snowcheck.snow_variables(lon, lat, ds, i)[0])
+        snowfall_list.append(snowcheck.snow_variables(lon, lat, ds, i)[2])
+        sun_list.append(snowcheck.snow_variables(lon, lat, ds, i)[4])
+        wind_list.append(snowcheck.snow_variables(lon, lat, ds, i)[6])
 
-    data = {'Time': Time_list,
-            'Snowcover': Snowcover_list,
-            'Snowfall': Snowfall_list,
-            'Sun': Sun_list,
-            'Wind': Wind_list}
+    data = {'Time': time_list,
+            'Snowcover': snowcover_list,
+            'Snowfall': snowfall_list,
+            'Sun': sun_list,
+            'Wind': wind_list}
 
     df = pd.DataFrame.from_dict(data, orient='index').transpose()
 
@@ -181,7 +194,7 @@ def weather_table(lon, lat, ds):
     # snowcheck.snow_variables function
 
     pattern = r'(\b\d\b)'
-    rows = re.sub(pattern, match_counter, rows)
+    rows = re.sub(pattern, get_match_value, rows)
 
     # Insert headers and rows into the HTML table code
     html_table = html_table.replace("{}", headers, 1).replace("{}", rows, 1)
@@ -214,7 +227,6 @@ def geographical_table(lon, lat, ds):
 
     """
     # Table 2
-
     # Create dataset for physical variables
 
     data2 = {'Minimum Mountain Height': (snowcheck.mountain_check
@@ -337,7 +349,7 @@ def html_page(html_table, html_table2):
     """
 
     # Save the entire HTML page code to a file
-    html_filename = "tabels.html"
+    html_filename = "tables.html"
     with open(html_filename, "w") as file:
         file.write(html_page)
 
