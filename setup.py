@@ -54,8 +54,9 @@ req_packages = ['numpy',
                 'xarray',
                 'matplotlib',
                 'netCDF4',
-                'metpy'
-                'MSEplots-pkg']
+                'metpy',
+                'MSEplots-pkg',
+                'scikit-learn']
 
 check_dependencies(req_packages)
 
