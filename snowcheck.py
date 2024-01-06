@@ -1,12 +1,5 @@
 import numpy as np
-
 from wrfvis import grid
-
-# ds = xr.open_dataset(cfg.wrfout)
-# lon = 11
-# lat = 47
-# rad = 10000
-
 
 def mountain_check(lon, lat, ds):
     """
