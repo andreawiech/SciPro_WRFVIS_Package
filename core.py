@@ -346,7 +346,7 @@ def write_html(param, lon, lat, zagl, rad=0, directory=None):
 
 def skewT_html(lon, lat, time_index, directory=None):
     """ 
-    @ authors: Malte Hildebrandt, Andrea Wiech
+    @ authors: Malte Hildebrandt, Andrea Wiech, Matilda Achaab
     
     Create HTML with SkewT and MSE plots 
     
