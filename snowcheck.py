@@ -22,7 +22,7 @@ Dependencies
 
 Usage
 -----
-1. Import the module: `from wrfvis import mountain_check, snow_variables`.
+1. Import the module: `import wrfvis.snowcheck`.
 2. Call the desired functions based on skiing condition assessments.
 3. Ensure that the required dependencies are installed before using the module.
 """
