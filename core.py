@@ -371,7 +371,7 @@ def skewT_html(lon, lat, time_index, directory=None):
     print('plotting skewT and SkewT')
     path =['MSE.png','skewT.png']
     for p in path:
-        png = os.path.join(p)
+        png = os.path.join(directory, p)
         skewT.skewt_and_mseplot(df_skewT, df_skewT['P'], df_skewT['Temperature_in_degC'], df_skewT['dewpoint'],
                                   df_skewT['U'], df_skewT['V'], lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature,
                                   df_skewT['QVAPOR'], zlev, df_skewT['profile'],
