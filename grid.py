@@ -1,10 +1,46 @@
-"""contains functions related to the WRF grid """
+"""
+Module for WRF grid-related functions.
+
+Functions
+---------
+1. `haversine(lon1, lat1, lon2, lat2)`: 
+    Calculates the great circle distance between two points on Earth using the Haversine formula.
+
+2. `find_nearest_gridcell(xlong, xlat, lon, lat)`: 
+    Finds the nearest WRF grid cell to a specified longitude and latitude.
+
+3. `find_nearest_vlevel(ds, gcind, param, ztarget)`: 
+    Finds the nearest vertical level in a WRF dataset for a given variable and target height above ground.
+
+4. `find_direct_neighbors(gcind, rad, lon, lat, ds)`: 
+    Selects direct neighboring grid cells that lie inside a specified radius around a WRF grid cell.
+
+5. `find_grid_cells_in_radius(ngcind, ngcdist, rad, lon, lat, ds)`: 
+    Selects all grid cells within a radius around a target location, considering direct and indirect neighbors.
+
+Author
+------
+Fabien Maussion
+Manuela Lehner
+Andrea Wiech
+
+Dependencies
+------------
+- numpy as np
+
+Usage
+-----
+1. Import the module: `import [your_module_name]`.
+2. Call the desired functions based on the WRF grid-related tasks.
+3. Ensure that the required dependencies are installed before using the module.
+"""
 
 import numpy as np
 
 
 def haversine(lon1, lat1, lon2, lat2):
-    """Great circle distance between two (or more) points on Earth
+    """ 
+    Great circle distance between two (or more) points on Earth
 
     Author: Fabien Maussion
 
@@ -30,7 +66,7 @@ def haversine(lon1, lat1, lon2, lat2):
     >>> haversine(34, 42, [35, 36], [42, 42])
     array([ 82633.46475287, 165264.11172113])
     """
-
+    
     # convert decimal degrees to radians
     lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
         
@@ -43,7 +79,8 @@ def haversine(lon1, lat1, lon2, lat2):
 
 
 def find_nearest_gridcell(xlong, xlat, lon, lat):
-    """ find nearest grid cell
+    """ 
+    find nearest grid cell
     
     Parameters
     ----------
@@ -73,7 +110,8 @@ def find_nearest_gridcell(xlong, xlat, lon, lat):
 
 
 def find_nearest_vlevel(ds, gcind, param, ztarget):
-    """ find nearest vertical level
+    """ 
+    find nearest vertical level
     
     Parameters
     ----------
@@ -96,7 +134,8 @@ def find_nearest_vlevel(ds, gcind, param, ztarget):
     """
 
     # geopotential height
-    geopot_hgt = (ds['PHB'][:,:,gcind[0],gcind[1]] + ds['PH'][:,:,gcind[0],gcind[1]]) / 9.81
+    geopot_hgt = (ds['PHB'][:,:,gcind[0],gcind[1]] + 
+                  ds['PH'][:,:,gcind[0],gcind[1]]) / 9.81
 
     # unstagger the geopotential height to half levels
     # for our purposes it is good enough to assume that the half levels are exactly 
@@ -115,7 +154,8 @@ def find_nearest_vlevel(ds, gcind, param, ztarget):
 
 
 def find_direct_neighbors(gcind, rad, lon, lat, ds):
-    """ select direct neighboring grid cells that lie inside the radius of interest around a WRF grid cell
+    """ 
+    select direct neighboring grid cells that lie inside the radius of interest around a WRF grid cell
     
     Parameters
     ----------
@@ -198,7 +238,9 @@ def find_grid_cells_in_radius(ngcind, ngcdist, rad, lon, lat, ds):
             while len(neighboring_ngcind) != len(neighboring_ngcind_old):
                 neighboring_ngcind_old = neighboring_ngcind
                 for i in neighboring_ngcind_old:
-                    neighboring_ngcind = np.append(neighboring_ngcind_old, find_direct_neighbors(i, rad, lon, lat, ds), axis=0)
+                    neighboring_ngcind = np.append(neighboring_ngcind_old,
+                                                   find_direct_neighbors(
+                                                       i, rad, lon, lat, ds), axis=0)
                     neighboring_ngcind = np.unique(neighboring_ngcind, axis=0)
                 
             return neighboring_ngcind
