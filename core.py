@@ -42,7 +42,7 @@ Dependencies
 
 Usage
 -----
-1. Import the module: `import wrf_visualization_module as wvm`.
+1. Import the module: `import wrfvis.core`.
 2. Call the desired functions based on the visualization needs.
 3. Ensure that the required dependencies are installed before using the module.
 """
