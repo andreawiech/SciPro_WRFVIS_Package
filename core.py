@@ -291,7 +291,7 @@ def mkdir(path, reset=False):
 
 def write_html(param, lon, lat, zagl, rad=0, directory=None):
     """ 
-    @ authors: Manuela Lehner, Malte Hildebrandt
+    @ authors: Manuela Lehner, Andrea Wiech, Malte Hildebrandt
     
     Create HTML with WRF plot 
     
@@ -346,7 +346,7 @@ def write_html(param, lon, lat, zagl, rad=0, directory=None):
 
 def skewT_html(lon, lat, time_index, directory=None):
     """ 
-    @ authors: Malte Hildebrandt, Andrea Wiech, Matilda Achaab
+    @ authors: Manuela Lehner, Malte Hildebrandt, Matilda Achaab
     
     Create HTML with SkewT and MSE plots 
     
