@@ -13,7 +13,7 @@ Functions
 
 Doc Author
 ------
-Malte Hildebrandt
+Matilda Achaab
 
 Dependencies
 ------------
