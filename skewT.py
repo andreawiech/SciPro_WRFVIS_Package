@@ -30,7 +30,7 @@ Dependencies
 
 Usage
 -----
-1. Import the module: `import skewT `.
+1. Import the module: `import wrfvis.skewT `.
 2. Call the desired functions:
     - For extracting vertical profiles: `skewT.skewt_and_mseplot_dataframe(lon, lat, time_index)`.
     - For plotting SkewT and MSE diagrams: `skewT.skewt_and_mseplot(df_skewt, pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor, zlev, prof, filepath=None)`.
