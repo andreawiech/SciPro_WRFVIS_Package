@@ -1,13 +1,13 @@
 """ Configuration module containing settings and constants. """
+
 import os
 import sys
 
 #wrfout = '/home/c707201/temp/WRF_output_project.nc'
 wrfout = r'C:\Users\andre\Downloads\WRF_output_project.nc'
-output_directory = r'C:\Users\mhde\.conda\envs\wissprog\Lib\site-packages\wrfvis'
+output_directory = r'C:\Users\mhde\2_Wissprog\Term_Project\Plots_and_HTML'
 
 if os.path.isfile(wrfout):
-    
     # location of data directory
     pkgdir = os.path.dirname(__file__)
     html_template = os.path.join(pkgdir, 'data', 'template.html')
