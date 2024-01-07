@@ -1,15 +1,41 @@
 """
-This script provides functions to generate HTML tables containing weather and geographical information
-for skiing conditions based on WRF (Weather Research and Forecasting) model output.
+Module for generating HTML tables with skiing condition assessments based on WRF model parameters.
 
-Authors: Malte Hildebrandt, Joep van Noort
+Author
+------
+Joep van Noort, Malte Hildebrandt
 
-Dependencies:
-- pandas
-- xarray
-- wrfvis package (imported as cfg and snowcheck)
+Functions
+---------
+1. `get_match_value(match)`: 
+    Extracts output variables from `snowcheck.snow_variables` for each integer match in 'rows' HTML string. 
+    Used in `weather_table`.
 
-Note: Ensure that the necessary dependencies are installed before running the script.
+2. `weather_table(lon, lat, ds)`: 
+    Generates an HTML file with a table indicating skiing conditions. 
+    Uses `snowcheck.snow_variables` for assessing WRF parameter values with dynamic coloring.
+
+3. `geographical_table(lon, lat, ds)`: 
+    Generates an HTML file with a table providing location-dependent information for potential winter skiing. 
+    Uses `snowcheck.mountain_check` with dynamic coloring.
+
+4. `html_page(html_table, html_table2, filename="tables.html")`: 
+    Combines two HTML tables into a file saved to the specified directory.
+
+Dependencies
+------------
+- numpy as np
+- pandas as pd
+- xarray as xr
+- re
+- wrfvis.cfg
+- snowcheck
+
+Usage
+-----
+1. Import the module: `import wrfvis.tables.
+2. Call the desired functions based on skiing condition assessments.
+3. Ensure that the required dependencies are installed before using the module.
 """
 import os
 import pandas as pd
@@ -315,24 +341,24 @@ def geographical_table(lon, lat, ds):
     return html_table2
 
 
-def html_page(html_table, html_table2):
+def html_page(html_table, html_table2, filename="tables.html"):
     """
     @ authors: Malte Hildebrandt, Joep van Noort
 
     This function combines two html tables into one html file that is saved to
-    the local directory.
+    the specified directory.
 
     Parameters
     ----------
     html_table : input table 1
     html_table2 : input table 2
+    filename : name of the HTML file (default is "tables.html")
 
     Returns
     -------
     None.
 
     """
-
     # Create HTML code for the entire page
     html_page = f"""
     <!DOCTYPE html>
@@ -356,8 +382,6 @@ def html_page(html_table, html_table2):
         file.write(html_page)
 
     print(f"HTML page with tables saved as {full_path}")
-
-    print(f"HTML page with tables saved as {html_filename}")
 
 
 # ################### Test run ####################
