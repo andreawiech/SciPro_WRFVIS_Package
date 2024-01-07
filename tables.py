@@ -349,7 +349,6 @@ def html_page(html_table, html_table2):
     </html>
     """
 
-    # Save the entire HTML page code to a file
     output_directory = cfg.output_directory
     # Save the entire HTML page code to a file
     full_path = os.path.join(output_directory, filename)
