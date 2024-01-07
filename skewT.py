@@ -11,7 +11,7 @@ Functions
 2. `skewt_and_mseplot(df_skewt, pressure, temperature, dewpoint, uwind, vwind, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature, water_vapor, zlev, prof, filepath=None)`: 
     Plots SkewT and Moist Static Energy diagrams based on the provided data and saves the plots if a filepath is specified.
 
-Doc Author
+Author
 ------
 Matilda Achaab
 
