@@ -365,7 +365,7 @@ def skewT_html(lon, lat, time_index, directory=None):
 
     # extract vertical profile for SkewT and MSE 
     print('Extracting vertical profile for SkewT and MSE')
-    df_skewT, zlev, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature = skewT.skewt_and_mseplot_dataframe(lon, lat, time_index)
+    df_skewT, zlev, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature = skewT.skewT_and_MSEplot_dataframe(lon, lat, time_index)
 
     # plot the SkewT and MSE
     print('plotting skewT and SkewT')
