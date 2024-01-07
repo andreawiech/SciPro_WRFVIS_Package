@@ -242,29 +242,24 @@ def skewt_and_mseplot(df_skewT, pressure, temperature, dewpoint, uwind, vwind, l
 
     skew.shade_cape(pressure.values * units('hPa'), temperature.values * units('degC'),
                     prof.values * units('degC'), label='CAPE')
-    # Save the Skew-T plot if filepath is provided
-    if filepath is not None:
-        skewT_filepath = filepath.replace('.png', '_skewT.png')
-        # Show legend
-        skew.ax.legend()
-        plt.savefig(skewT_filepath, dpi=150)
+
+   #plot the skewT
+   if 'skewT.png' in filepath: 
+        plt.savefig(filepath, dpi=150)
         plt.show()
         plt.close()
-        print(f"Skew-T plot saved as: {skewT_filepath}")
-
-    # Plot the MSE plots
-    print('plotting MSE')
-    fig = plt.figure(figsize=(8, 6))
-    ax = mpt.msed_plots(pressure.values, temperature.values, water_vapor.values,
-                        zlev.values * units.m, h0_std=2000, ensemble_size=20,
-                        ent_rate=np.arange(0, 2, 0.05), entrain=False)
-
-    # Save the MSE plot if filepath is provided
-    if filepath is not None:
-        mse_filepath = filepath.replace('.png', '_MSE.png')  # Modify the filename
-        plt.savefig(mse_filepath, dpi=150)
-        plt.show()
-        plt.close()
-        print(f"MSE plot saved as: {mse_filepath}")
+        print(f"Skew-T plot saved as: {filepath}")
         
-    return fig, ax
+    elif 'MSE.png' in filepath:    
+        # Plot the MSE
+        print('plotting MSE')
+        fig,ax= mpt.msed_plots(pressure.values, temperature.values, water_vapor.values,
+                            zlev.values * units.m, h0_std=2000, ensemble_size=20,
+                            ent_rate=np.arange(0, 2, 0.05), entrain=False)
+    
+        # Save the MSE plot if filepath is provided
+        plt.savefig(filepath, dpi=150)
+        plt.show()
+        plt.close()
+        print(f"MSE plot saved as: {filepath}")
+    return fig
