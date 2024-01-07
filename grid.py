@@ -30,7 +30,7 @@ Dependencies
 
 Usage
 -----
-1. Import the module: `import [your_module_name]`.
+1. Import the module: `import wrfvis.grid`.
 2. Call the desired functions based on the WRF grid-related tasks.
 3. Ensure that the required dependencies are installed before using the module.
 """
