@@ -11,6 +11,7 @@ Dependencies:
 
 Note: Ensure that the necessary dependencies are installed before running the script.
 """
+import os
 import pandas as pd
 import xarray as xr
 import re
@@ -349,9 +350,13 @@ def html_page(html_table, html_table2):
     """
 
     # Save the entire HTML page code to a file
-    html_filename = "tables.html"
-    with open(html_filename, "w") as file:
+    output_directory = cfg.output_directory
+    # Save the entire HTML page code to a file
+    full_path = os.path.join(output_directory, filename)
+    with open(full_path, "w") as file:
         file.write(html_page)
+
+    print(f"HTML page with tables saved as {full_path}")
 
     print(f"HTML page with tables saved as {html_filename}")
 
