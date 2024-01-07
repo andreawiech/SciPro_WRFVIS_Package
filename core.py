@@ -365,14 +365,14 @@ def skewT_html(lon, lat, time_index, directory=None):
 
     # extract vertical profile for SkewT and MSE 
     print('Extracting vertical profile for SkewT and MSE')
-    df_skewT, zlev, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature = skewT.skewT_and_MSEplot_dataframe(lon, lat, time_index)
+    df_skewT, zlev, lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature = skewT.skewt_and_mseplot_dataframe(lon, lat, time_index)
 
     # plot the SkewT and MSE
     print('plotting skewT and SkewT')
     path =['MSE.png','skewT.png']
     for p in path:
         png = os.path.join(p)
-        skewT.skewT_and_MSED_plot(df_skewT, df_skewT['P'], df_skewT['Temperature_in_degC'], df_skewT['dewpoint'],
+        skewT.skewt_and_mseplot(df_skewT, df_skewT['P'], df_skewT['Temperature_in_degC'], df_skewT['dewpoint'],
                                   df_skewT['U'], df_skewT['V'], lcl_pressure, lcl_temperature, lfc_pressure, lfc_temperature,
                                   df_skewT['QVAPOR'], zlev, df_skewT['profile'],
                                   filepath =png)
