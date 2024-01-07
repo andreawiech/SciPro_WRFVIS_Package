@@ -4,7 +4,6 @@ Manuela Lehner
 November 2023
 """
 
-
 import sys
 import webbrowser
 
