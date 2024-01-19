@@ -244,7 +244,7 @@ def skewt_and_mseplot(df_skewT, pressure, temperature, dewpoint, uwind, vwind, l
                     prof.values * units('degC'), label='CAPE')
 
    #plot the skewT
-   if 'skewT.png' in filepath: 
+    if 'skewT.png' in filepath: 
         plt.savefig(filepath, dpi=150)
         plt.show()
         plt.close()
