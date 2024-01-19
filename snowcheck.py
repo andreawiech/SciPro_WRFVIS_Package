@@ -87,6 +87,7 @@ def mountain_check(lon, lat, ds):
         snowsure = 'No'
         # print("The model topography suggests unreliable snowcover due "
         #       f"to a height of only {topographic_height:.0f} meters")
+        slope = ds['SLOPE'][0, ngcind[0], ngcind[1]].values
         if slope > 0.018:
             skiing_slope = 'Yes'
             # print("Additionally, this area is not too flat for skiing")
