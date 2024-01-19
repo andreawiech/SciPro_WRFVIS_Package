@@ -8,7 +8,9 @@ Created on Thu Jan 11 10:22:18 2024
 """
 Module to create SkewT plots from WRF output data.
 
-This module provides functions to read WRF (Weather Research and Forecasting) output files, extract vertical profiles, and generate SkewT plots. Additionally, it includes functionality to plot Moist Static Energy (MSE) diagrams.
+This module provides functions to read WRF (Weather Research and Forecasting) output files,
+extract vertical profiles, and generate SkewT plots. Additionally, it includes functionality 
+to plot Moist Static Energy (MSE) diagrams.
 
 Functions
 ---------
@@ -34,10 +36,12 @@ Functions
     Calculates severe weather parameters, including K-Index and Total Totals Index.
 
 8. `mixed_layer_properties(pressure, temperature, prof)`: 
-    Calculates mixed-layer parcel properties, including Mixed-Layer Convective Available Potential Energy (MLCAPE) and Convective Inhibition (MLCIN).
+    Calculates mixed-layer parcel properties, including Mixed-Layer Convective Available Potential 
+    Energy (MLCAPE) and Convective Inhibition (MLCIN).
 
 9. `unstable_parcel_properties(pressure, temperature, dewpoint, zlev)`: 
-    Calculates properties of the most unstable parcel, including Most Unstable Convective Available Potential Energy (MUCAPE) and Convective Inhibition (MUCIN).
+    Calculates properties of the most unstable parcel, including Most Unstable Convective Available Potential Energy 
+    (MUCAPE) and Convective Inhibition (MUCIN).
 
 10. `surface_based_cape_cin(pressure, temperature, dewpoint)`: 
     Calculates Surface-based Convective Available Potential Energy (SBCAPE) and Convective Inhibition (SBCIN).
