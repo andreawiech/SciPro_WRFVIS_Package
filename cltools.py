@@ -10,7 +10,21 @@ import webbrowser
 
 import wrfvis
 
-HELP = """wrfvis_gridcell: Visualization of WRF output at a single selected grid cell.
+HELP = """wrfvis_gridcell: Visualisation of WRF output. 
+            Depending on specified parameters 4 different HTML files are created.
+
+1. timeseries for one or more gridcells in a specified radius around a target location 
+to get that specify --parameter, --location and --radius.
+
+2. skewT and moiststaticenergy plot for a gridcell a desired number of hours in advance
+to get that specify --location and --timeindex.
+
+3. snowcheck table to see when the snowconditions are the best
+to get that specify --location
+
+4. timeserie, skewT and moiststaticenery plots and snowckeck table in one file
+to get that specify --parameter, --location, --radius and --timeindex
+
 
 Usage:
    -h, --help                       : print the help
@@ -24,7 +38,7 @@ Usage:
    --no-browser                     : the default behavior is to open a browser with the
                                       newly generated visualisation. Set to ignore
                                       and print the path to the html file instead
-"""
+    """
 
 
 def gridcell(args):
@@ -68,9 +82,9 @@ def gridcell(args):
         timeindex = int(args[args.index('-t') + 1])
         if '-r' in args:
             rad = float(args[args.index('-r') + 1])
-            html_path = wrfvis.write_html(param, lon, lat, zagl, rad, timeindex)
+            html_path = wrfvis.generate_combined_html(param, lon, lat, timeindex, zagl, rad)
         else:
-            html_path = wrfvis.write_html(param, lon, lat, zagl, timeindex)
+            html_path = wrfvis.generate_combined_html(param, lon, lat, timeindex, zagl)
         if '--no-browser' in args:
             print('File successfully generated at: ' + html_path)
         else:
@@ -87,16 +101,15 @@ def gridcell(args):
             # if radius is entered call write_html_multiple_gridcell function 
             # with radius
             rad = float(args[args.index('-r') + 1])
-            html_path = wrfvis.write_html_multiple_gridcell(param, lon, lat, zagl, rad)
+            html_content, html_path = wrfvis.write_html_multiple_gridcell(param, lon, lat, zagl, rad)
         else:
             # if no radius is entered call write_html_multiple_gridcell function
             # without radius
-            html_path = wrfvis.write_html_multiple_gridcell(param, lon, lat, zagl)
+            html_content, html_path = wrfvis.write_html_multiple_gridcell(param, lon, lat, zagl)
         if '--no-browser' in args:
             print('File successfully generated at: ' + html_path)
         else:
             webbrowser.get().open_new_tab('file://' + html_path)
-            
     
     elif  ('-l' in args) and  ('-t' in args):
         # if command line arguments -l and -t are entered, assign
@@ -105,7 +118,7 @@ def gridcell(args):
         lon = float(args[args.index('-l') + 1])
         lat = float(args[args.index('-l') + 2])
         #  write html for the skew T
-        html_path = wrfvis.write_html_skewT(lon, lat, time_index)
+        html_content, html_path = wrfvis.write_html_skewT(lon, lat, time_index)
         if '--no-browser' in args:
             print('File successfully generated at: ' + html_path)
         else:
@@ -117,7 +130,7 @@ def gridcell(args):
         lon = float(args[args.index('-l') + 1])
         lat = float(args[args.index('-l') + 2])
         # write html for the snowcheck
-        html_path = wrfvis.write_html_snowcheck(lon, lat)
+        html_content, html_path = wrfvis.write_html_snowcheck(lon, lat)
         if '--no-browser' in args:
             print('File successfully generated at: ' + html_path)
         else:
