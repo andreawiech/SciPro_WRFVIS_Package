@@ -9,7 +9,10 @@ Constants
 Files
 -----
 - `html_template`: Path to the HTML template file.
+- `html_topo_template`: Path to the topo HTML template file.
+- `html_timeseries_template`: Path to the timeseries HTML template file.
 - `html_skewT_template`: Path to the skewT HTML template file.
+- `html_snowcheck_template`: Path to the snowcheck HTML template file.
 - `test_ts_df`: Path to the test timeseries DataFrame file.
 - `test_hgt`: Path to the test topography file.
 
@@ -26,15 +29,18 @@ If the specified WRF output file does not exist, an error message will be displa
 import os
 import sys
 
-wrfout = 'C:/Users/mhde/2_Wissprog/Term_Project/WRF_output_project.nc'
-output_directory = r'C:\Users\mhde\2_Wissprog\Term_Project\Plots_and_HTML'
+wrfout = r'C:\Users\andre\Downloads\WRF_output_project.nc'
+output_directory = r'C:\Users\andre\OneDrive\Dokumente\UNI\Master_Semester_1\ScientificProgramming\FinalProject\FinalVersion\wrvis_main\wrfvis\data\Plots_and_HTML'
 
 if os.path.isfile(wrfout):
     
     # location of data directory
     pkgdir = os.path.dirname(__file__)
-    html_template = os.path.join(pkgdir, 'data', 'template.html')
-    html_skewT_template = os.path.join(pkgdir, 'data', 'skewT_template.html')  
+    html_template = os.path.join(pkgdir, 'data', 'template.html') 
+    html_topo_template = os.path.join(pkgdir, 'data', 'topo_template.html')
+    html_timeseries_template = os.path.join(pkgdir, 'data', 'timeseries_template.html')
+    html_skewT_template = os.path.join(pkgdir, 'data', 'skewT_template.html')
+    html_snowcheck_template = os.path.join(pkgdir, 'data', 'snowcheck_template.html')
     test_ts_df = os.path.join(pkgdir, 'data', 'test_df_timeseries.pkl')
     test_hgt = os.path.join(pkgdir, 'data', 'test_hgt.nc')
 
