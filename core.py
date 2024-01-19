@@ -302,11 +302,11 @@ def mkdir(path, reset=False):
     return path
 
 
-def write_html(param, lon, lat, zagl, rad=0, directory=None):
+def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
     """ 
     @ authors: Manuela Lehner, Malte Hildebrandt
     
-    Create HTML with WRF plot 
+    Create HTML with WRF topo and timeseries plot
     
     Returns
     -------
@@ -355,7 +355,7 @@ def write_html(param, lon, lat, zagl, rad=0, directory=None):
     return html_content, outpath
 
 
-def skewT_html(lon, lat, time_index, directory=None):
+def write_html_skewT(lon, lat, time_index, directory=None):
     """ 
     @ authors: Malte Hildebrandt, Andrea Wiech
     
@@ -381,7 +381,7 @@ def skewT_html(lon, lat, time_index, directory=None):
                                                             time_index)
 
     # plot the SkewT and MSE
-    print('plotting skewT and SkewT')
+    print('plotting SkewT and MSE')
     path = ['MSE.png', 'skewT.png']
     for p in path:
         png = os.path.join(directory, p)
@@ -425,6 +425,11 @@ def skewT_html(lon, lat, time_index, directory=None):
     return html_content, outpath
 
 
+def write_html_snowcheck(lon, lat, directory=None):
+    #Placeholder for the writesnowcheck html function
+    return
+
+
 def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
                            directory=None):
     """
@@ -461,11 +466,11 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
         # Generate plots
         # Extract HTML content and paths from functions
         print("Generating WRF timeseries plot...")
-        html_timeseries, path_timeseries = write_html(param, lon, lat, zagl,
+        html_timeseries, path_timeseries = write_html_multiple_gridcell(param, lon, lat, zagl,
                                                       rad=rad,
                                                       directory=directory)
         print("Generating SkewT and MSE plots...")
-        html_skewT_mse, path_skewT_mse = skewT_html(lon, lat, time_index,
+        html_skewT_mse, path_skewT_mse = write_html_skewT(lon, lat, time_index,
                                                     directory=directory)
 
         html_content = f"""
