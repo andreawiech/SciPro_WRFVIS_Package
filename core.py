@@ -38,7 +38,8 @@ Dependencies
 - numpy as np
 - pandas as pd
 - xarray as xr
-- wrfvis.cfg, grid, graphics, skewT, tables
+- wrfvis.cfg, grid, graphics, tables
+- skewT_and_mse as sm
 
 Usage
 -----
@@ -55,7 +56,8 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-from wrfvis import cfg, grid, graphics, skewT, tables
+from wrfvis import cfg, grid, graphics,tables
+from wrfvis import skewT_and_mse as sm
 
 def get_wrf_timeseries(param, lon, lat, zagl, rad = 0):
     """
@@ -357,7 +359,7 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
 
 def write_html_skewT(lon, lat, time_index, directory=None):
     """ 
-    @ authors: Malte Hildebrandt, Andrea Wiech
+    @ authors: Malte Hildebrandt, Matilda Achaab
     
     Create HTML with SkewT and MSE plots 
     
@@ -376,25 +378,25 @@ def write_html_skewT(lon, lat, time_index, directory=None):
 
     # extract vertical profile for SkewT and MSE 
     print('Extracting vertical profile for SkewT and MSE')
-    df_skewT, zlev, lcl_pressure, lcl_temperature, lfc_pressure, \
-        lfc_temperature = skewT.skewt_and_mseplot_dataframe(lon, lat,
-                                                            time_index)
+    df,pressure,temp,mixing_ratio,geo_hght,dewpoint,prof, lcl_pressure,lcl_temperature,\
+    lfc_pressure,lfc_temperature = sm.skewT_and_Mse_dataframe(time_index,lon,lat)
+    
+    print('Extracting severe weather parameters')
+    sbcape, sbcin, mucape, mucin, mlcape, mlcin, kindex, totals_index \
+        = sm.summary_severe_weather_par(pressure,temp,dewpoint,geo_hght,prof)
 
-    # plot the SkewT and MSE
-    print('plotting SkewT and MSE')
-    path = ['MSE.png', 'skewT.png']
-    for p in path:
-        png = os.path.join(directory, p)
-        skewT.skewt_and_mseplot(df_skewT, df_skewT['P'],
-                                df_skewT['Temperature_in_degC'],
-                                df_skewT['dewpoint'],df_skewT['U'],
-                                df_skewT['V'], lcl_pressure, lcl_temperature,
-                                lfc_pressure, lfc_temperature,
-                                df_skewT['QVAPOR'], zlev, df_skewT['profile'],
-                                filepath=png)
-        
-    png_skewT = os.path.join(directory, 'skewT.png')
-    png_MSE = os.path.join(directory, 'MSE.png')
+    # plot the SkewT 
+    print('plotting SkewT')
+    png_skewT = os.path.join(directory, 'skewt.png')
+    sm.skewT_plot(df, pressure, temp, dewpoint, df['U'], df['V'],
+                  lcl_pressure, lcl_temperature, lfc_pressure,mlcape, 
+                  lfc_temperature, prof,sbcape, sbcin, mucape, mucin, 
+                  mlcin, kindex, totals_index, filepath=png_skewT )
+    
+    #plot the MSE
+    print('plotting MSE')
+    png_mse = os.path.join(directory, 'MSE.png')
+    sm.mse_plot(df,pressure,temp,mixing_ratio,geo_hght,filepath =png_mse)
 
     # create HTML from template
     outpath = os.path.join(directory, 'skewT_MSE.html')
@@ -409,7 +411,7 @@ def write_html_skewT(lon, lat, time_index, directory=None):
                 
                 # Add section for MSE plot
                 txt_mse = txt.replace('[MSE_IMGPATH]',
-                                      os.path.relpath(png_MSE, directory))
+                                      os.path.relpath(png_mse, directory))
                 
                 out.append(txt)
                 out.append(txt_mse)
@@ -423,11 +425,6 @@ def write_html_skewT(lon, lat, time_index, directory=None):
         html_content = html_file.read()
 
     return html_content, outpath
-
-
-def write_html_snowcheck(lon, lat, directory=None):
-    #Placeholder for the writesnowcheck html function
-    return
 
 
 def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
