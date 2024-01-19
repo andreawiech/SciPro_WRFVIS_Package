@@ -9,7 +9,7 @@ We reproduce their license terms here:
 Copyright (c) 2016 The Python Packaging Authority (PyPA)
 Copyright (c) 2018 Fabien Maussion
 Copytight (c) 2023 Manuela Lehner
-Copytight (c) 2024 Mathilda Achaab, Malte Hildebrand, Joep Van Noort, Andrea Wiech
+Copytight (c) 2024 Matilda Achaab, Malte Hildebrand, Joep Van Noort, Andrea Wiech
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this file (the "Software"), to deal in
