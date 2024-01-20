@@ -1,82 +1,23 @@
 """
-Module for generating HTML tables with skiing condition assessments based on WRF model parameters.
+This script provides functions to generate HTML tables containing weather and
+geographical information for skiing conditions based on WRF (Weather Research
+and Forecasting) model output.
 
-Author
-------
-Joep van Noort, Malte Hildebrandt
+Authors: Malte Hildebrandt, Joep van Noort
 
-Functions
----------
-1. `get_match_value(match)`: 
-    Extracts output variables from `snowcheck.snow_variables` for each integer match in 'rows' HTML string. 
-    Used in `weather_table`.
+Dependencies:
+- pandas
+- wrfvis package (imported as snowcheck)
+- Beautiful Soup 4
 
-2. `weather_table(lon, lat, ds)`: 
-    Generates an HTML file with a table indicating skiing conditions. 
-    Uses `snowcheck.snow_variables` for assessing WRF parameter values with dynamic coloring.
-
-3. `geographical_table(lon, lat, ds)`: 
-    Generates an HTML file with a table providing location-dependent information for potential winter skiing. 
-    Uses `snowcheck.mountain_check` with dynamic coloring.
-
-4. `html_page(html_table, html_table2, filename="tables.html")`: 
-    Combines two HTML tables into a file saved to the specified directory.
-
-Dependencies
-------------
-- numpy as np
-- pandas as pd
-- xarray as xr
-- re
-- wrfvis.cfg
-- snowcheck
-
-Usage
------
-1. Import the module: `import wrfvis.tables.
-2. Call the desired functions based on skiing condition assessments.
-3. Ensure that the required dependencies are installed before using the module.
+Note: Ensure that the necessary dependencies are installed before
+running the script.
 """
-import os
 import pandas as pd
-import xarray as xr
-import re
+from bs4 import BeautifulSoup
+import os
 
-from wrfvis import cfg, snowcheck
-
-
-def get_match_value(match):
-    """
-    @author: Joep van Noort
-
-    This function is called within the weather_table function as a regex
-    argument. It works similar to a loop, where a counter is used to
-    sequentially obtain output variables from the snowcheck.snow_variables
-    function for each integer match in the 'rows' html-string. This allows
-    the dynamically generated colored html table within the snow_variables
-    function to retain its colors (based on a numerical value) and change
-    the displayed values in the final resulting html file to natural language.
-
-    Parameters
-    ----------
-    match : match to predefined regex pattern
-
-    Returns
-    -------
-    output : natural language or numerical value corresponding to the
-             snow_variables function output indeces 1, 3, 5, 7.
-
-    """
-    global counter
-    global timestep
-    output = snowcheck.snow_variables(lon, lat, ds, timestep)[counter]
-    counter += 2
-    if counter > 7:
-        counter = 1
-        timestep += 1
-    if timestep > 35:
-        timestep = 0
-    return output
+from wrfvis import snowcheck, cfg
 
 
 def weather_table(lon, lat, ds):
@@ -96,7 +37,6 @@ def weather_table(lon, lat, ds):
     lon : user input longitude value in degrees East
     lat : user input latitude value in degrees North
     ds : wrfout dataset
-    time : WRF model timestep (0-35, default 24)
 
     Returns
     -------
@@ -216,12 +156,29 @@ def weather_table(lon, lat, ds):
                 rows += '<td>{}</td>'.format(value)
         rows += '</tr>\n'
 
-    # Using regular expressions, change each of the colored cells with a single
-    # integer value to display the correct output data from
-    # snowcheck.snow_variables function
+    # create timeseries list of weather variable values
+    timestep = range(36)
+    replacement_list = []
 
-    pattern = r'(\b\d\b)'
-    rows = re.sub(pattern, get_match_value, rows)
+    for i in timestep:
+        replacement_list.append(snowcheck.snow_variables(lon, lat, ds, i)[1])
+        replacement_list.append(snowcheck.snow_variables(lon, lat, ds, i)[3])
+        replacement_list.append(snowcheck.snow_variables(lon, lat, ds, i)[5])
+        replacement_list.append(snowcheck.snow_variables(lon, lat, ds, i)[7])
+
+    soup = BeautifulSoup(rows, 'html.parser')
+
+    # Find all <td> tags with class="red", "green", or "yellow"
+    td_tags = soup.find_all('td', class_=['red', 'orange',
+                                          'lime', 'green', 'yellow'])
+
+    # Iterate through the td_tags and replace the text content with elements
+    # from the replacement_list
+    for i, td_tag in enumerate(td_tags):
+        td_tag.string.replace_with(str(replacement_list[i % len(replacement_list)]))
+
+    # Assign the modified HTML string
+    rows = str(soup)
 
     # Insert headers and rows into the HTML table code
     html_table = html_table.replace("{}", headers, 1).replace("{}", rows, 1)
@@ -346,19 +303,19 @@ def html_page(html_table, html_table2, filename="tables.html"):
     @ authors: Malte Hildebrandt, Joep van Noort
 
     This function combines two html tables into one html file that is saved to
-    the specified directory.
+    the local directory.
 
     Parameters
     ----------
     html_table : input table 1
     html_table2 : input table 2
-    filename : name of the HTML file (default is "tables.html")
 
     Returns
     -------
     None.
 
     """
+
     # Create HTML code for the entire page
     html_page = f"""
     <!DOCTYPE html>
@@ -382,18 +339,3 @@ def html_page(html_table, html_table2, filename="tables.html"):
         file.write(html_page)
 
     print(f"HTML page with tables saved as {full_path}")
-
-
-# ################### Test run ####################
-
-# test values
-ds = xr.open_dataset(cfg.wrfout)
-lon = 11
-lat = 47
-time = 24
-counter = 1
-timestep = 0
-
-html_table = weather_table(lon, lat, ds)
-html_table2 = geographical_table(lon, lat, ds)
-html_page(html_table, html_table2)
