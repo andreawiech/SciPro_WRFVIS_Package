@@ -1,34 +1,6 @@
-"""
-Module for assessing skiing conditions based on WRF model parameters.
-
-Author
-------
-Joep van Noort
-
-Functions
----------
-1. `mountain_check(lon, lat, ds)`: 
-    Estimates whether a given location is of sufficient altitude for reliable snow cover during the Northern Hemisphere Winter.
-    Returns minimum_mountain_height, topographic_height, snowsure, skiing_slope.
-
-2. `snow_variables(lon, lat, ds, time=24)`: 
-    Assesses meteorological conditions for skiing at a given location based on WRF parameters such as snowfall, sunshine, and wind.
-    Returns snowcover, snowfall, sun, wind.
-
-Dependencies
-------------
-- numpy as np
-- wrfvis.grid
-
-Usage
------
-1. Import the module: `import wrfvis.snowcheck`.
-2. Call the desired functions based on skiing condition assessments.
-3. Ensure that the required dependencies are installed before using the module.
-"""
-
 import numpy as np
 from wrfvis import grid
+
 
 def mountain_check(lon, lat, ds):
     """
@@ -41,11 +13,6 @@ def mountain_check(lon, lat, ds):
     The linear function relating winter snowcover and latitude is based on
     Saavedra (2018), Hantel et al. (2012) and ski resort base heights in Spain
     and Austria with a range of latitudes between 37ºN and 48ºN.
-
-    It also checks if there are sufficient height differences in the gricell.
-    Using the Slope variable from the WRF output, it was found that a value
-    of 0.018 represents a representative cutoff between areas that are too
-    flat and areas that have adequate slopes. 
 
     Parameters
     ----------
@@ -72,25 +39,34 @@ def mountain_check(lon, lat, ds):
 
     # Use WRF HGT parameter to obtain model height of gridcell
     topographic_height = ds['HGT'][0, ngcind[0], ngcind[1]].values
+    # print("The minimum snowsure mountain height in winter at this "
+    #       f'latitude is {minimum_mountain_height:.0f} meters.')
 
     # Compare topographic height and minimum snowsure height. Also check slope
     # angle
     if topographic_height > minimum_mountain_height:
         snowsure = 'Yes'
-        # obtain slope value from WRF SLOPE paramter
+        # print("The model topography suggests this to be a snowsure loca"
+        #       f"tion with a height of {topographic_height:.0f} meters")
         slope = ds['SLOPE'][0, ngcind[0], ngcind[1]].values
         if slope > 0.018:
             skiing_slope = 'Yes'
+            # print("Additionally, this area is not too flat for skiing")
         else:
             skiing_slope = 'No'
+            # print("Unfortunately, this area might be too flat for skiing")
     else:
         snowsure = 'No'
+        # print("The model topography suggests unreliable snowcover due "
+        #       f"to a height of only {topographic_height:.0f} meters")
         slope = ds['SLOPE'][0, ngcind[0], ngcind[1]].values
         if slope > 0.018:
             skiing_slope = 'Yes'
+            # print("Additionally, this area is not too flat for skiing")
         else:
             skiing_slope = 'No'
-    # format the strings including mountain height and topographic height
+            # print("Unfortunately, this area might be too flat for skiing")
+
     minimum_mountain_height_value = f'{minimum_mountain_height:,.0f} meters'
     topographic_height_value = f'{topographic_height:,.0f} meters'
 
@@ -106,9 +82,6 @@ def snow_variables(lon, lat, ds, time=24):
     This function uses WRF parameters to assess the meteorological conditions
     for a given location with skiing in mind. Snowfall, sunshine and wind are
     considered.
-
-    Values of 0-4 are given to enable coloring in html tables used for 
-    output of these parameters. 
 
     Parameters
     ----------
@@ -129,44 +102,34 @@ def snow_variables(lon, lat, ds, time=24):
            wind is then given a score from 0 to 4, less wind is better. It is
            based on the Beaufort scale.
     """
-    # For input location, obtain gridcell index and distance from center
+
     ngcind, ngcdist = grid.find_nearest_gridcell(
                       ds.XLONG[0, :, :], ds.XLAT[0, :, :], lon, lat)
 
-    # set snowcover_value to 'None'
     snowcover_value = 'None'
-    # obtain snowcover variable value from WRF SNOWC parameter
     snowcover = ds['SNOWC'][time, ngcind[0], ngcind[1]].values
     if snowcover == 0:
         snowcover = 0
     else:
         snowcover = 4
         snowcover_value = 'Yes'
-        
-    # Set Snowfall to 0, changes only if accumulated snowfall is predicted
+
     snowfall = 0
-    snowfall_value = 'None :('
-    # Obtain accumulated snowfall from WRF SNOWNC parameter.
     accumulated_snowfall = ds['SNOWNC'][time, ngcind[0], ngcind[1]].values
     if np.any(accumulated_snowfall > 0) and np.all(accumulated_snowfall < 5):
         snowfall = 1
-        snowfall_value = '0-5 cm'
     elif (np.any(accumulated_snowfall >= 5)
           and np.all(accumulated_snowfall < 15)):
         snowfall = 2
-        snowfall_value = '5-15 cm'
     elif (np.any(accumulated_snowfall >= 15)
           and np.all(accumulated_snowfall < 30)):
         snowfall = 3
-        snowfall_value = '15-30 cm'
     elif np.any(accumulated_snowfall >= 30):
         snowfall = 4
-        snowfall_value = '>30 cm :D'
+    snowfall_value = f'{accumulated_snowfall:,.0f} cm'
 
-    # Set Sun to 4, change if clouds are predicted
     sun = 4
     sun_value = 'Sunny'
-    # Obtain cloud fraction from WRF CLDFRA parameter.
     cloud_fraction = ds['CLDFRA'][time, np.arange(77), ngcind[0],
                                   ngcind[1]].values
     if np.any(cloud_fraction > 0.05) and np.all(cloud_fraction < 0.1):
@@ -182,9 +145,7 @@ def snow_variables(lon, lat, ds, time=24):
         sun = 0
         sun_value = 'Overcast'
 
-    # set wind value to 4, change if windspeed is >1 m/s
     wind = 4
-    # calculate winspeed as the sum of U and V wind vectors.
     wind_U = ds['U10'][time, ngcind[0], ngcind[1]].values
     wind_V = ds['V10'][time, ngcind[0], ngcind[1]].values
     windspeed = np.sqrt((wind_U)**2+(wind_V)**2)
@@ -196,7 +157,7 @@ def snow_variables(lon, lat, ds, time=24):
         wind = 1
     elif windspeed >= 15:
         wind = 0
-    wind_value = f'{windspeed:,.2f} m/s'
+    wind_value = f'{windspeed:,.1f} m/s'
 
     return (snowcover, snowcover_value, snowfall, snowfall_value, sun,
             sun_value, wind, wind_value)
