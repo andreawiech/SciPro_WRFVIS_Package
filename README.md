@@ -32,6 +32,7 @@ Make sure you have all dependencies installed. These are:
 - codecs
 - importlib
 - scikit-learn
+- extration_and_calculation
 
   
 Download the package and install it in development mode. From the root directory,
