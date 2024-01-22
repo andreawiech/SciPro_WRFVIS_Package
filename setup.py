@@ -67,7 +67,8 @@ req_packages = ['numpy',
                 're',
                 'setuptools',
                 'codecs',
-                'importlib']
+                'importlib',
+                'extration_and_calculation']
 
 check_dependencies(req_packages)
 
