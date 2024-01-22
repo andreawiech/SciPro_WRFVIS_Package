@@ -70,7 +70,7 @@ Dependencies:
 - metpy.units as units
 - metpy.plots as SkewT
 - MSEplots.plots as mpt
-- extration_and_calculation as ec
+- extraction_and_calculation as ec
 
 Usage:
 ------
@@ -98,7 +98,7 @@ from metpy.units import units
 import matplotlib.pyplot as plt
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
-import extration_and_calculation as ec
+import extratcion_and_calculation as ec
 
 
 def skewT_and_Mse_dataframe(time_index,lon,lat):
