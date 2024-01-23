@@ -380,7 +380,7 @@ def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
                            df.attrs['time'][0], loc='left'))
 
     fig = plt.figure(figsize=(8, 6))
-    ax= mpt.msed_plots(pressure.values, temperature.values,water_vapor.values*units('kg/kg'), 
+    fig, ax= mpt.msed_plots(pressure.values, temperature.values,water_vapor.values, 
                        zlev.values, h0_std=2000, ensemble_size=20,
                        ent_rate=np.arange(0, 2, 0.05), entrain=False)
     
