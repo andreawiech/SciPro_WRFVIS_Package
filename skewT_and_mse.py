@@ -390,4 +390,4 @@ def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
         plt.close()
         print(f"MSE plot saved as: {filepath}")
         
-    return ax
+    return fig
