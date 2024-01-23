@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 11 10:22:18 2024
-
-@author: matildaachaab
-"""
 """
 Module to create SkewT plots from WRF output data.
 
