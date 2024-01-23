@@ -69,6 +69,7 @@ def plot_topo(topo, lonlat, filepath=None):
     if filepath is not None:
         plt.savefig(filepath, dpi=150)
         plt.close()
+    plt.savefig('topo.png')
 
     return fig
 
@@ -112,12 +113,13 @@ def plot_ts(df, col_names, filepath=None):
         if filepath is not None:
             plt.savefig(filepath, dpi=150)
             plt.close()
-            
+        plt.savefig('timeseries.png')    
+        
     else:
         for i in col_names:
             ax.plot(df[i], label=f"Lon: {df[i].attrs['lon_grid_point']:.2f}, "
-                                 f"Lat: {df[i].attrs['lat_grid_point']:.2f} ")
-        ax.legend()
+                    f"Lat: {df[i].attrs['lat_grid_point']:.2f} ")
+            ax.legend(loc='upper right')
         ax.set_ylabel(f"{df.attrs['variable_name']} ({df.attrs['variable_units']})")
 
         # title contains information about lon, lat, z agl, and time
@@ -148,5 +150,6 @@ def plot_ts(df, col_names, filepath=None):
         if filepath is not None:
             plt.savefig(filepath, dpi=150)
             plt.close()
+        plt.savefig('timeseries.png')
 
     return fig
