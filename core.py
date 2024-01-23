@@ -391,12 +391,12 @@ def write_html_skewT(lon, lat, time_index, directory=None):
     sm.skewT_plot(df, pressure, temp, dewpoint, df['U'], df['V'],
                   lcl_pressure, lcl_temperature, lfc_pressure,mlcape, 
                   lfc_temperature, prof,sbcape, sbcin, mucape, mucin, 
-                  mlcin, kindex, totals_index, filepath=png_skewT )
+                  mlcin, kindex, totals_index,filepath=png_skewT)
     
     #plot the MSE
     print('plotting MSE')
     png_mse = os.path.join(directory, 'MSE.png')
-    sm.mse_plot(df,pressure,temp,mixing_ratio,geo_hght,filepath =png_mse)
+    sm.mse_plot(df,pressure,temp,mixing_ratio,geo_hght,filepath=png_mse)
 
     # create HTML from template
     outpath = os.path.join(directory, 'skewT_MSE.html')
