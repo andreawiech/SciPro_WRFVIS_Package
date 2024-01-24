@@ -49,7 +49,6 @@ Usage
 """
 
 import os
-from tempfile import mkdtemp
 import shutil
 
 import numpy as np
@@ -325,7 +324,6 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
     # extract timeseries from WRF output
     print('Extracting timeseries at nearest grid cell')
     df, hgt, col_names = get_wrf_timeseries(param, lon, lat, zagl, rad)
-   
     print('Plotting data')
     # plot the timeseries
     png_ts = os.path.join(directory, 'timeseries.png')
