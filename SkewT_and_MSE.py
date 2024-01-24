@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 11 15:18:41 2024
-
-@author: Matilda Achaab
-"""
-
 """
 wrfvis: Module for SkewT and Moist Static Energy (MSE) Plots from WRF Output Data
 
@@ -98,12 +91,12 @@ from metpy.units import units
 import matplotlib.pyplot as plt
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
-import extration_and_calculation as ec
+from wrfvis import extraction_and_calculation as ec
 
 
 def skewT_and_Mse_dataframe(time_index,lon,lat):
     """
-    Extration of all the dataset required for the skewT.
+    Extraction of all the dataset required for the skewT.
     
     Parameters
     ----------
@@ -327,7 +320,7 @@ def skewT_plot(df, pressure, temperature, dewpoint, uwind, vwind,
     if filepath is None: 
         plt.savefig(filepath, dpi=150)
         print(f"Skew-T plot saved as: {filepath}")
-    plt.savefig('mm.png')
+    plt.savefig('SkewT.png')
         
     return fig
 
@@ -376,5 +369,5 @@ def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
         plt.savefig(filepath, dpi=150)
         plt.close()
         print(f"MSE plot saved as: {filepath}")
-        
+    plt.savefig('mse.png')
     return fig
