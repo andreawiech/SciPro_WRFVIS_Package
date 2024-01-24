@@ -80,55 +80,67 @@ def weather_table(lon, lat, ds):
         width: 50%;
         margin: 20px;
       }
-
+    
       th, td {
         border: 2px solid black;
         padding: 10px;
         text-align: center;
       }
-
+    
       th {
         background-color: #6b768a;
         color: white;
       }
-
+    
       tr:nth-child(even) {
         background-color: #f2f2f2;
       }
-
+    
       tr:hover {
         background-color: #ddd;
       }
-
+    
       .red {
         background-color: #FF6961;
       }
-
+    
       .orange {
         background-color: #FAC898;
       }
-
+    
       .yellow {
         background-color: #fdfd96;
       }
-
+    
       .lime {
         background-color: #D1FEB8;
       }
-
+    
       .green {
         background-color: #77DD77;
+      }
+    
+      .description {
+        margin-left: 20px; /* Adjust margin as needed */
+        max-width: 50%; /* Set maximum width for the description */
       }
     </style>
     </head>
     <body>
-
+    
     <table>
     <caption>Skiing weather variables</caption>
       <tr>{}</tr>
       {}
     </table>
-
+    
+    <div class="description">
+      <p>This table provides information about weather conditions for skiing.</p>
+      <p>In der Stiegl-Brauwelt kann Bier mit allen Sinnen erlebt werden.
+      Natürlich führt der erste Weg in das Bier-Museum über Stiegen,
+      schließlich trägt die Stieglbrauerei deshalb ihren Namen.</p>
+    </div>
+    
     </body>
     </html>
     """
@@ -298,23 +310,30 @@ def geographical_table(lon, lat, ds):
     return html_table2
 
 
-def html_page(html_table, html_table2, filename="tables.html"):
+def html_page(html_table, html_table2, filename="snowcheck.html", directory=None):
     """
     @ authors: Malte Hildebrandt, Joep van Noort
 
     This function combines two html tables into one html file that is saved to
-    the local directory.
+    the specified or default local directory.
 
     Parameters
     ----------
     html_table : input table 1
     html_table2 : input table 2
+    filename : str, optional
+        Name of the HTML file. Default is "snowcheck.html".
+    directory : str, optional
+        Directory where the HTML file will be saved. If not provided, a default directory may be used.
 
     Returns
     -------
     None.
-
     """
+
+    # Create directory for the plot if not provided
+    if directory is None:
+        directory = cfg.output_directory
 
     # Create HTML code for the entire page
     html_page = f"""
@@ -332,10 +351,7 @@ def html_page(html_table, html_table2, filename="tables.html"):
     </html>
     """
 
-    output_directory = cfg.output_directory
-    # Save the entire HTML page code to a file
-    full_path = os.path.join(output_directory, filename)
+    # Save the entire HTML page code to a file in the specified directory
+    full_path = os.path.join(directory, filename)
     with open(full_path, "w") as file:
         file.write(html_page)
-
-    print(f"HTML page with tables saved as {full_path}")
