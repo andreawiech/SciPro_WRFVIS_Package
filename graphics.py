@@ -48,7 +48,6 @@ def plot_topo(topo, lonlat, filepath=None):
     lonlat: tuple
         longitude, latitude of WRF grid cell
     '''
-
     fig, ax = plt.subplots(figsize=(8, 6))
     ax.set_position([0.1, 0.1, 0.75, 0.85])
     ax.set_xlabel('Longitude ($^{\circ}$)')
@@ -66,10 +65,8 @@ def plot_topo(topo, lonlat, filepath=None):
     cb = plt.colorbar(hc, ax=cbax, fraction=1, format='%.0f')
     cb.ax.set_ylabel('$z$ (MSL)')
 
-    if filepath is not None:
-        plt.savefig(filepath, dpi=150)
-        plt.close()
-    plt.savefig('topo.png')
+    plt.savefig(filepath, dpi=150)
+    plt.close()
 
     return fig
 
@@ -83,7 +80,7 @@ def plot_ts(df, col_names, filepath=None):
     df: pandas dataframe
         timeseries of df.variable_name
     '''
-
+    
     fig, ax = plt.subplots(figsize=(10, 4))
     if df.shape[1] == 1: 
         ax.plot(df[df.attrs['variable_name']], color='black')
@@ -110,10 +107,7 @@ def plot_ts(df, col_names, filepath=None):
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
         ax.set_xlabel('Time (UTC)')
 
-        if filepath is not None:
-            plt.savefig(filepath, dpi=150)
-            plt.close()
-        plt.savefig('timeseries.png')    
+        plt.savefig(filepath, dpi=150)
         
     else:
         for i in col_names:
@@ -147,9 +141,6 @@ def plot_ts(df, col_names, filepath=None):
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
         ax.set_xlabel('Time (UTC)')
     
-        if filepath is not None:
-            plt.savefig(filepath, dpi=150)
-            plt.close()
-        plt.savefig('timeseries.png')
+        plt.savefig(filepath, dpi=150)
 
     return fig
