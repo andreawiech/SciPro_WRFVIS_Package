@@ -91,6 +91,54 @@ from metpy.units import units
 import matplotlib.pyplot as plt
 from metpy.plots import SkewT
 from MSEplots import plots as mpt
+from wrfvis import extraction_and_calculation as ec
+
+
+def skewT_and_Mse_dataframe(time_index,lon,lat):
+    """
+    Extraction of all the dataset required for the skewT.
+    
+    Parameters
+    ----------
+    time_index: integer
+        the time for extracting the vertical profile
+    lon : float
+        the longitude
+    lat : float
+        the latitude
+    Returns
+    -------
+    df: pd.DataFrame 
+        timeseries variables of the vertical profile with additional attributes (grid cell lon, lat, dist, ...)
+    pressure: pd.Dtaframe
+            pressure profile.
+    temperature: pd.Dataframe
+           temperature profile  
+    mixing ratio: pd.Dataframe
+            water_vapor profile 
+    dewpoint: pd.Dataframe
+            dewpoint temperature profile
+    lcl_pressure : float
+            Pressure (hPa) at the Lifted Condensation Level (LCL).
+    lcl_temperature : float
+            Temperature ('°'C) at the Lifted Condensation Level (LCL).
+    lfc_pressure : float
+            Pressure (hPa) at the Level of Free Convection (LFC).
+    lfc_temperature : float
+            Temperature ('°'C) at the Level of Free Convection (LFC).
+    geopotential : pd.Dataframe
+        Altitude values (in meters).
+    """
+
+    df = ec.extration_skewT_variables(time_index,lon,lat)
+    temp,pressure,mixing_ratio,geo_hght =  ec.convert_var_to_actual_values(df)
+    dewpoint = ec.calculation_dewpoint(temp,pressure,mixing_ratio)
+    prof = ec.parcel_profie(temp,pressure,dewpoint)
+    lcl_pressure, lcl_temperature,lfc_pressure,lfc_temperature = ec.attris_of_skewT(pressure,temp,dewpoint)
+
+    return (df,pressure,temp,mixing_ratio,geo_hght,dewpoint,prof,
+        lcl_pressure,lcl_temperature,lfc_pressure,lfc_temperature)
+
 
 def summary_severe_weather_par(pressure,temp,dewpoint,geo_hght,prof):
     """
