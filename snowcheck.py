@@ -1,3 +1,32 @@
+"""
+Module for assessing skiing conditions based on WRF model parameters.
+
+Author
+------
+Joep van Noort
+
+Functions
+---------
+1. `mountain_check(lon, lat, ds)`: 
+    Estimates whether a given location is of sufficient altitude for reliable snow cover during the Northern Hemisphere Winter.
+    Returns minimum_mountain_height, topographic_height, snowsure, skiing_slope.
+
+2. `snow_variables(lon, lat, ds, time=24)`: 
+    Assesses meteorological conditions for skiing at a given location based on WRF parameters such as snowfall, sunshine, and wind.
+    Returns snowcover, snowfall, sun, wind.
+
+Dependencies
+------------
+- numpy as np
+- wrfvis.grid
+
+Usage
+-----
+1. Import the module: `import wrfvis.snowcheck`.
+2. Call the desired functions based on skiing condition assessments.
+3. Ensure that the required dependencies are installed before using the module.
+"""
+
 import numpy as np
 from wrfvis import grid
 
