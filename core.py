@@ -320,8 +320,7 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
 
     # create directory for the plot
     if directory is None:
-        directory = mkdtemp()
-    mkdir(directory)
+        directory = cfg.output_directory
 
     # extract timeseries from WRF output
     print('Extracting timeseries at nearest grid cell')
@@ -353,6 +352,52 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
 
     with open(outpath, 'r') as html_file:
         html_content = html_file.read()
+        
+    print(f"HTML file with topo and timeseries is saved at: {outpath}")
+
+    return html_content, outpath
+
+def write_html_snowcheck(lon, lat, directory=None):
+    """
+    @ author: Malte Hildebrandt
+    Generates HTML tables containing weather and geographical information for skiing conditions.
+
+    Parameters
+    ----------
+    lon : float
+        User input longitude value in degrees East.
+    lat : float
+        User input latitude value in degrees North.
+    directory : str, optional
+        Directory where the HTML file and associated plots will be saved. If not provided, a temporary directory will be created.
+
+    Returns
+    -------
+    html_content : str
+        HTML content as a string containing weather and geographical tables.
+    outpath : str
+        Path to the saved HTML file.
+    """
+
+    # Create directory for the plot if not provided
+    if directory is None:
+        directory = cfg.output_directory
+
+    # Open the WRF dataset
+    with xr.open_dataset(cfg.wrfout) as ds:
+        # Generate tables
+        print("Generating geographical table...")
+        table_geographical = tables.geographical_table(lon, lat, ds)
+        print("Generating weather table...")
+        table_weather = tables.weather_table(lon, lat, ds)
+
+    # Use html_page function to combine tables into a single HTML content
+    html_content = tables.html_page(table_weather, table_geographical, directory=directory)
+
+    # Create HTML file path
+    outpath = os.path.join(directory, 'snowcheck.html')
+
+    print(f"HTML file with weather and geographic table is saved at: {outpath}")
 
     return html_content, outpath
 
@@ -373,8 +418,7 @@ def write_html_skewT(lon, lat, time_index, directory=None):
     
     # create directory for the plot
     if directory is None:
-        directory = mkdtemp()
-    mkdir(directory)
+        directory = cfg.output_directory
 
     # extract vertical profile for SkewT and MSE 
     print('Extracting vertical profile for SkewT and MSE')
@@ -424,6 +468,8 @@ def write_html_skewT(lon, lat, time_index, directory=None):
     with open(outpath, 'r') as html_file:
         html_content = html_file.read()
 
+    print(f"HTML file with skewT and MSE plot is saved at: {outpath}")
+    
     return html_content, outpath
 
 
