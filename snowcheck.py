@@ -7,12 +7,14 @@ Joep van Noort
 
 Functions
 ---------
-1. `mountain_check(lon, lat, ds)`: 
-    Estimates whether a given location is of sufficient altitude for reliable snow cover during the Northern Hemisphere Winter.
-    Returns minimum_mountain_height, topographic_height, snowsure, skiing_slope.
+1. `mountain_check(lon, lat, ds)`:
+    Estimates whether a given location is of sufficient altitude for reliable
+    snow cover during the Northern Hemisphere Winter.
+   Returns minimum_mountain_height, topographic_height, snowsure, skiing_slope.
 
-2. `snow_variables(lon, lat, ds, time=24)`: 
-    Assesses meteorological conditions for skiing at a given location based on WRF parameters such as snowfall, sunshine, and wind.
+2. `snow_variables(lon, lat, ds, time=24)`:
+    Assesses meteorological conditions for skiing at a given location based on
+    WRF parameters such as snowfall, sunshine, and wind.
     Returns snowcover, snowfall, sun, wind.
 
 Dependencies
