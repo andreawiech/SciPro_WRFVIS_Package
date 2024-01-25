@@ -503,8 +503,7 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
     with xr.open_dataset(cfg.wrfout) as ds:
         # Create the output directory if it doesn't exist
         if directory is None:
-            directory = os.getcwd()
-        os.makedirs(directory, exist_ok=True)
+            directory = cfg.output_directory
 
         # Generate tables
         print("Generating geographical table...")
