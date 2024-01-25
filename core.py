@@ -512,7 +512,6 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
         table_weather = tables.weather_table(lon, lat, ds)
 
         # Generate plots
-        # Extract HTML content and paths from functions
         print("Generating WRF timeseries plot...")
         html_timeseries, path_timeseries = write_html_multiple_gridcell(param, lon, lat, zagl,
                                                       rad=rad,
@@ -521,113 +520,22 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
         html_skewT_mse, path_skewT_mse = write_html_skewT(lon, lat, time_index,
                                                     directory=directory)
 
-        html_content = f"""
-        <html>
-        <head>
-            <style>
-                body {{
-                    margin: 0;
-                    padding: 0;
-                }}
-        
-                .flex-container {{
-                    display: flex;
-                    justify-content: space-between;
-                    overflow-x: auto;
-                    flex-wrap: wrap;
-                    border-bottom: 2px solid black;
-                    padding-bottom: 10px;
-                    margin-bottom: 20px;
-                }}
-        
-                .flex-item {{
-                    margin-right: 5px;
-                    flex-wrap: wrap;
-                    width: 150%;
-                }}
-        
-                .flex-subitem {{
-                    margin-right: 5px;
-                    width: 49%;
-                    box-sizing: border-box;
-                }}
-        
-                img {{
-                    max-width: 100%;
-                    height: auto;
-                    display: block;
-                    margin: 0 auto;
-                }}
-        
-                .table-description {{
-                    margin-top: 20px;
-                    max-width: 100%;
-                }}
-            </style>
-        </head>
-        <body>
-        
-        <h1>Visualization of WRF model output</h1>
-        
-        <h2>Tables</h2>
-        
-        <div class="flex-container">
-            <div class="flex-item">
-                <h3>Geographical Table</h3>
-                {table_geographical}
-                <!-- Add a description under the geo table -->
-                <div class="table-description">
-                    <p>
-                        The Minimum Mountain Height in this table represents the
-                        calculated minimum elevation of mountains, and it is 
-                        contingent on their respective longitudes. 
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="flex-container">
-            <div class="flex-item">
-                <h3>Weather Table</h3>
-                {table_weather}
-            </div>
-        </div>
-        
-        <h2>Model topography and Timeseries Plot</h2>
-        
-        <div class="flex-container">
-            <div class="flex-subitem" style="width: 38%;">
-                <h3>Model topography</h3>
-                <img alt="no img" src="topography.png" width="100%">
-            </div>
-            <div class="flex-subitem" style="width: 60%;">
-                <h3>Timeseries</h3>
-                <img alt="no img" src="timeseries.png" width="100%">
-            </div>
-        </div>
-        
-        <h2>SkewT and MSE Plots</h2>
-        
-        <div class="flex-container">
-            <div class="flex-subitem">
-                <h3>SkewT Diagram</h3>
-                <img alt="no img" src="skewt.png">
-            </div>
-            <div class="flex-subitem">
-                <h3>MSE Diagram</h3>
-                <img alt="no img" src="MSE.png">
-            </div>
-        </div>
-        
-        </body>
-        </html>
-        """
+        # Read the template
+        with open(cfg.html_combined_template, 'r') as template_file:
+            template_content = template_file.read()
 
-        print("Saving HTML file...")
+        # Replace placeholders in the template
+        template_content = template_content.replace("[GEOGRAPHICAL_TABLE_CONTENT]", table_geographical)
+        template_content = template_content.replace("[WEATHER_TABLE_CONTENT]", table_weather)
+        template_content = template_content.replace("[TOPOGRAPHY_IMG_PATH]", os.path.relpath("topography.png", directory))
+        template_content = template_content.replace("[TIMESERIES_IMG_PATH]", os.path.relpath(path_timeseries, directory))
+        template_content = template_content.replace("[SKEWT_IMG_PATH]", os.path.relpath(path_skewT_mse, directory))
+        template_content = template_content.replace("[MSE_IMG_PATH]", os.path.relpath(path_skewT_mse, directory))
+
         # Save HTML file
-        html_filepath = os.path.join(directory,
-                                     'Visualization_of_WRF_model.html')
+        html_filepath = os.path.join(directory, 'Visualization_of_WRF_model.html')
         with open(html_filepath, 'w') as html_file:
-            html_file.write(html_content)
-            
+            html_file.write(template_content)
+
         print(f"HTML file saved at: {html_filepath}")
         return html_filepath
