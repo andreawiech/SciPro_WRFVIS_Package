@@ -115,7 +115,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad = 0):
                 else:
                     vararray = ds[param][np.arange(len(ds.Time)),
                                          nlind, ngcind[0], ngcind[1]]
-                df = vararray[:,0].to_dataframe()
+                df = vararray[:,0].to_dataframe()[param]
     
                 # add information about the variable
                 df.attrs['variable_name'] = param
@@ -139,7 +139,7 @@ def get_wrf_timeseries(param, lon, lat, zagl, rad = 0):
         
             # extract time series
             vararray = ds[param][np.arange(len(ds.Time)), ngcind[0], ngcind[1]]
-            df = vararray[:].to_dataframe()
+            df = vararray[:].to_dataframe()[param]
 
             # add information about the variable
             df.attrs['variable_name'] = param
@@ -322,21 +322,29 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
         directory = cfg.output_directory
 
     # extract timeseries from WRF output
-    print('Extracting timeseries at nearest grid cell')
+    print('Extracting timeseries at grid cells')
     df, hgt, col_names = get_wrf_timeseries(param, lon, lat, zagl, rad)
     print('Plotting data')
+
+    # plot a topography map
+    png_topo = os.path.join(directory, 'topography.png')
+    if df.shape == (36,):
+        graphics.plot_topo(hgt, (df.attrs['lon_grid_point'],
+                                 df.attrs['lat_grid_point']), filepath=png_topo)
+
+    else:
+        graphics.plot_topo(hgt, (df[param].attrs['lon_grid_point'], 
+                                 df[param].attrs['lat_grid_point']), filepath=png_topo)
+   
     # plot the timeseries
     png_ts = os.path.join(directory, 'timeseries.png')
     graphics.plot_ts(df,col_names, filepath=png_ts)
 
-    # plot a topography map
-    png_topo = os.path.join(directory, 'topography.png')
-    for i in col_names:
-        graphics.plot_topo(hgt, (df[param].attrs['lon_grid_point'], 
-                       df[i].attrs['lat_grid_point']), filepath=png_topo)
 
     # create HTML from template
     outpath = os.path.join(directory, 'topo_ts.html')
+    
+    
     with open(cfg.html_template, 'r') as infile:
         lines = infile.readlines()
         out = []
@@ -345,7 +353,7 @@ def write_html_multiple_gridcell(param, lon, lat, zagl, rad=0, directory=None):
             txt = txt.replace('[PLOTVAR]', param)
             txt = txt.replace('[IMGTYPE]', 'timeseries')
             out.append(txt)
-        with open(outpath, 'w') as outfile:
+    with open(outpath, 'w') as outfile:
             outfile.writelines(out)
 
     with open(outpath, 'r') as html_file:
