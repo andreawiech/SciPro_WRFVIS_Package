@@ -610,11 +610,11 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
         <div class="flex-container">
             <div class="flex-subitem">
                 <h3>SkewT Diagram</h3>
-                <img alt="no img" src="skewT.png" width="680">
+                <img alt="no img" src="skewt.png">
             </div>
             <div class="flex-subitem">
                 <h3>MSE Diagram</h3>
-                <img alt="no img" src="MSE.png" width="730">
+                <img alt="no img" src="MSE.png">
             </div>
         </div>
         
@@ -622,13 +622,12 @@ def generate_combined_html(param, lon, lat, time_index, zagl, rad=0,
         </html>
         """
 
-
         print("Saving HTML file...")
         # Save HTML file
         html_filepath = os.path.join(directory,
                                      'Visualization_of_WRF_model.html')
         with open(html_filepath, 'w') as html_file:
             html_file.write(html_content)
-
+            
         print(f"HTML file saved at: {html_filepath}")
         return html_filepath
