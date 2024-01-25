@@ -69,82 +69,6 @@ def weather_table(lon, lat, ds):
 
     df = pd.DataFrame.from_dict(data, orient='index').transpose()
 
-    # Create HTML table dynamically with cell colors for weather variables
-    html_table = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <style>
-      table {
-        border-collapse: collapse;
-        width: 50%;
-        margin: 20px;
-      }
-    
-      th, td {
-        border: 2px solid black;
-        padding: 10px;
-        text-align: center;
-      }
-    
-      th {
-        background-color: #6b768a;
-        color: white;
-      }
-    
-      tr:nth-child(even) {
-        background-color: #f2f2f2;
-      }
-    
-      tr:hover {
-        background-color: #ddd;
-      }
-    
-      .red {
-        background-color: #FF6961;
-      }
-    
-      .orange {
-        background-color: #FAC898;
-      }
-    
-      .yellow {
-        background-color: #fdfd96;
-      }
-    
-      .lime {
-        background-color: #D1FEB8;
-      }
-    
-      .green {
-        background-color: #77DD77;
-      }
-    
-      .description {
-        margin-left: 20px; /* Adjust margin as needed */
-        max-width: 50%; /* Set maximum width for the description */
-      }
-    </style>
-    </head>
-    <body>
-    
-    <table>
-    <caption>Skiing weather variables</caption>
-      <tr>{}</tr>
-      {}
-    </table>
-    
-    <div class="description">
-      <p>This table provides information about weather conditions for skiing.</p>
-      <p>In der Stiegl-Brauwelt kann Bier mit allen Sinnen erlebt werden.
-      Natürlich führt der erste Weg in das Bier-Museum über Stiegen,
-      schließlich trägt die Stieglbrauerei deshalb ihren Namen.</p>
-    </div>
-    
-    </body>
-    </html>
-    """
-
     # Create table headers dynamically for weather variables
     headers = ('\n'.join(['<th>{}</th>'.format(header)
                           for header in df.columns]))
@@ -192,8 +116,12 @@ def weather_table(lon, lat, ds):
     # Assign the modified HTML string
     rows = str(soup)
 
-    # Insert headers and rows into the HTML table code
-    html_table = html_table.replace("{}", headers, 1).replace("{}", rows, 1)
+    # Load HTML template from file
+    with open(cfg.html_weather_template, 'r') as template_file:
+        html_template = template_file.read()
+
+    # Insert headers and rows into the HTML template code
+    html_table = html_template.replace("{}", headers, 1).replace("{}", rows, 1)
 
     return html_table
 
@@ -233,58 +161,9 @@ def geographical_table(lon, lat, ds):
 
     df2 = pd.DataFrame([data2])
 
-    # Create HTML table for physical attributes
-    html_table2 = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <style>
-      table {
-        border-collapse: collapse;
-        width: 50%;
-        margin: 20px;
-      }
-
-      th, td {
-        border: 2px solid black;
-        padding: 10px;
-        text-align: center;
-      }
-
-      th {
-        background-color: #6b768a;
-        color: white;
-      }
-
-      tr:nth-child(even) {
-        background-color: #f2f2f2;
-      }
-
-      tr:hover {
-        background-color: #ddd;
-      }
-
-      .red {
-        background-color: #FF6961;
-      }
-
-      .green {
-        background-color: #77DD77;
-      }
-
-    </style>
-    </head>
-    <body>
-
-    <table>
-    <caption>Geographical attributes for skiing in winter</caption>
-      <tr>{}</tr>
-      {}
-    </table>
-
-    </body>
-    </html>
-    """
+    # Load HTML template from file
+    with open(cfg.html_geographic_template, 'r') as template_file:
+        html_template2 = template_file.read()
 
     # Create table headers for physical attributes
     headers2 = ('\n'.join(['<th>{}</th>'.format(header)
@@ -304,8 +183,8 @@ def geographical_table(lon, lat, ds):
         rows2 += '</tr>\n'
 
     # Insert headers and rows into the HTML table code
-    html_table2 = (html_table2.replace("{}", headers2, 1).replace("{}",
-                                                                  rows2, 1))
+    html_table2 = (html_template2.replace("{}", headers2, 1)
+                    .replace("{}", rows2, 1))
 
     return html_table2
 
@@ -335,23 +214,11 @@ def html_page(html_table, html_table2, filename="snowcheck.html", directory=None
     if directory is None:
         directory = cfg.output_directory
 
-    # Create HTML code for the entire page
-    html_page = f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-    </head>
-    <body>
-
-    <!-- Insert the HTML table code -->
-    {html_table}
-    {html_table2}
-
-    </body>
-    </html>
-    """
+    # Load HTML template from file
+    with open(cfg.html_twotable_template, 'r') as template_file:
+        html_template_page = template_file.read()
 
     # Save the entire HTML page code to a file in the specified directory
     full_path = os.path.join(directory, filename)
     with open(full_path, "w") as file:
-        file.write(html_page)
+        file.write(html_template_page.format(html_table, html_table2))
