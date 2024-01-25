@@ -317,14 +317,11 @@ def skewT_plot(df, pressure, temperature, dewpoint, uwind, vwind,
                 color='black', ha='left')
     
     #plot the MSE
-    if filepath is None: 
-        plt.savefig(filepath, dpi=150)
-        print(f"Skew-T plot saved as: {filepath}")
-    plt.savefig('SkewT.png')
-        
+    plt.savefig(filepath, dpi=150)
+    plt.close()
+    print(f"Skew-T plot saved as: {filepath}")
+
     return fig
-
-
 
 def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
     """
@@ -365,9 +362,8 @@ def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
                        ent_rate=np.arange(0, 2, 0.05), entrain=False)
     
     #plot the Mse
-    if filepath is None: 
-        plt.savefig(filepath, dpi=150)
-        plt.close()
-        print(f"MSE plot saved as: {filepath}")
-    plt.savefig('mse.png')
+    plt.savefig(filepath, dpi=150)
+    plt.close()
+    print(f"MSE plot saved as: {filepath}")
+
     return fig
