@@ -1,5 +1,5 @@
 """
-Configuration module containing settings and constants.
+Configuration module containing settings and constants for a WRF (Weather Research and Forecasting) output analysis script.
 
 Constants
 ---------
@@ -8,18 +8,19 @@ Constants
 
 Files
 -----
-- `html_template`: Path to the HTML template file.
-- `html_topo_template`: Path to the topo HTML template file.
-- `html_timeseries_template`: Path to the timeseries HTML template file.
+- `html_template`: Path to the general HTML template file.
 - `html_skewT_template`: Path to the skewT HTML template file.
-- `html_snowcheck_template`: Path to the snowcheck HTML template file.
+- `html_weather_template`: Path to the weather table HTML template file.
+- `html_geographic_template`: Path to the geographic table HTML template file.
+- `html_twotable_template`: Path to the two-table HTML template file.
+- `html_combined_template`: Path to the combined HTML template file.
 - `test_ts_df`: Path to the test timeseries DataFrame file.
 - `test_hgt`: Path to the test topography file.
 
 Parameters
 ----------
-- `topo_min`: Minimum elevation for topography plot.
-- `topo_max`: Maximum elevation for topography plot.
+- `topo_min`: Minimum elevation for the topography plot.
+- `topo_max`: Maximum elevation for the topography plot.
 
 Note
 ----
@@ -37,10 +38,11 @@ if os.path.isfile(wrfout):
     # location of data directory
     pkgdir = os.path.dirname(__file__)
     html_template = os.path.join(pkgdir, 'data', 'template.html') 
-    html_topo_template = os.path.join(pkgdir, 'data', 'topo_template.html')
-    html_timeseries_template = os.path.join(pkgdir, 'data', 'timeseries_template.html')
     html_skewT_template = os.path.join(pkgdir, 'data', 'skewT_template.html')
-    html_snowcheck_template = os.path.join(pkgdir, 'data', 'snowcheck_template.html')
+    html_weather_template = os.path.join(pkgdir, 'data', 'weather_table_template.html')
+    html_geographic_template = os.path.join(pkgdir, 'data', 'geogr_table_template.html')
+    html_twotable_template = os.path.join(pkgdir, 'data', 'twotable_template.html')
+    html_combined_template = os.path.join(pkgdir, 'data', 'combined_template.html')
     test_ts_df = os.path.join(pkgdir, 'data', 'test_df_timeseries.pkl')
     test_hgt = os.path.join(pkgdir, 'data', 'test_hgt.nc')
 
