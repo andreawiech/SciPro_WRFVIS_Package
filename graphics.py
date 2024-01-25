@@ -104,7 +104,7 @@ def plot_ts(df, col_names, filepath=None):
             title = ('WRF time series at location {:.2f}$^{{\circ}}$E/'
                      '{:.2f}$^{{\circ}}$N\nModel initialization time:'
                      ' {:%d %b %Y, %H%M} UTC')
-            plt.title(title.format(df.attrs['lon_grid_point'], df.attrs['lon_grid_point'],
+            plt.title(title.format(df.attrs['lon_grid_point'], df.attrs['lat_grid_point'],
                                    df.index[0]), loc='left')
             
             plt.savefig(filepath, dpi=150)
