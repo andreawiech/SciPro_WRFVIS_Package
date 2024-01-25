@@ -1,0 +1,98 @@
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            overflow-x: auto;
+            flex-wrap: wrap;
+            border-bottom: 2px solid black;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .flex-item {
+            margin-right: 5px;
+            flex-wrap: wrap;
+            width: 150%;
+        }
+
+        .flex-subitem {
+            margin-right: 5px;
+            width: 49%;
+            box-sizing: border-box;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .table-description {
+            margin-top: 20px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Visualization of WRF model output</h1>
+
+<h2>Tables</h2>
+
+<div class="flex-container">
+    <div class="flex-item">
+        <h3>Geographical Table</h3>
+        [GEOGRAPHICAL_TABLE_CONTENT]
+        <!-- Add a description under the geo table -->
+        <div class="table-description">
+            <p>
+                The Minimum Mountain Height in this table represents the
+                calculated minimum elevation of mountains, and it is 
+                contingent on their respective longitudes. 
+            </p>
+        </div>
+    </div>
+</div>
+<div class="flex-container">
+    <div class="flex-item">
+        <h3>Weather Table</h3>
+        [WEATHER_TABLE_CONTENT]
+    </div>
+</div>
+
+<h2>Model topography and Timeseries Plot</h2>
+
+<div class="flex-container">
+    <div class="flex-subitem" style="width: 38%;">
+        <h3>Model topography</h3>
+        <img alt="no img" src="topography.png" width="100%">
+    </div>
+    <div class="flex-subitem" style="width: 60%;">
+        <h3>Timeseries</h3>
+        <img alt="no img" src="timeseries.png" width="100%">
+    </div>
+</div>
+
+<h2>SkewT and MSE Plots</h2>
+
+<div class="flex-container">
+    <div class="flex-subitem">
+        <h3>SkewT Diagram</h3>
+        <img alt="no img" src="skewt.png" width="100%">
+    </div>
+    <div class="flex-subitem">
+        <h3>MSE Diagram</h3>
+        <img alt="no img" src="MSE.png" width="87%">
+    </div>
+</div>
+
+</body>
+</html>
