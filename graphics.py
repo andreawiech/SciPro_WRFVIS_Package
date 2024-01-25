@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 from matplotlib import dates
 from wrfvis import cfg 
 
-plt.ioff()
+#plt.ioff()
 
 def plot_topo(topo, lonlat, filepath=None):
     ''' 
@@ -82,32 +82,32 @@ def plot_ts(df, col_names, filepath=None):
     '''
     
     fig, ax = plt.subplots(figsize=(10, 4))
-    if df.shape[1] == 1: 
-        ax.plot(df[df.attrs['variable_name']], color='black')
+    if df.shape == (36,): 
+        ax.plot(df, color='black')
         ax.set_ylabel(f"{df.attrs['variable_name']} ({df.attrs['variable_units']})")
+         # format the datetime tick mark labels
+        ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
+        ax.set_xlabel('Time (UTC)')
         
         # title contains information about lon, lat, z agl, and time
         try:
             title = ('WRF time series at location {:.2f}$^{{\circ}}$E/'
                      '{:.2f}$^{{\circ}}$N, grid point elevation at time 0: {:.2f}'
                      ' m a.g.l\nModel initialization time: {:%d %b %Y, %H%M} UTC')
-            plt.title(title.format(df.XLONG[0], df.XLAT[0],
+            plt.title(title.format(df.attrs['lon_grid_point'], df.attrs['lat_grid_point'],
                                    df.attrs['grid_point_elevation_time0'],
                                    df.index[0]), loc='left')
+        
+            plt.savefig(filepath, dpi=150)
             
         except:   
             title = ('WRF time series at location {:.2f}$^{{\circ}}$E/'
                      '{:.2f}$^{{\circ}}$N\nModel initialization time:'
                      ' {:%d %b %Y, %H%M} UTC')
-            plt.title(title.format(df.XLONG[0], df.XLAT[0],
+            plt.title(title.format(df.attrs['lon_grid_point'], df.attrs['lon_grid_point'],
                                    df.index[0]), loc='left')
-        
-
-        # format the datetime tick mark labels
-        ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
-        ax.set_xlabel('Time (UTC)')
-
-        plt.savefig(filepath, dpi=150)
+            
+            plt.savefig(filepath, dpi=150)
         
     else:
         for i in col_names:
@@ -115,7 +115,10 @@ def plot_ts(df, col_names, filepath=None):
                     f"Lat: {df[i].attrs['lat_grid_point']:.2f} ")
             ax.legend(loc='upper right')
         ax.set_ylabel(f"{df.attrs['variable_name']} ({df.attrs['variable_units']})")
-
+        
+        # format the datetime tick mark labels
+        ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
+        ax.set_xlabel('Time (UTC)')
         # title contains information about lon, lat, z agl, and time
         try:
             title = ('WRF time series at location {:.2f}$^{{\circ}}$E/'
@@ -125,22 +128,16 @@ def plot_ts(df, col_names, filepath=None):
                                    float(df[df.attrs['variable_name']].attrs['lat_grid_point']),
                                    df.attrs['grid_point_elevation_time0'],
                                    df.index[0]), loc='left')
-
+          
+            plt.savefig(filepath, dpi = 150)
         except:
             title = ('WRF time series at location {lonstr:.2f}$^{{\circ}}$E/'
                      '{latstr:.2f}$^{{\circ}}$N\nModel initialization time: {index:%d %b %Y, %H%M} UTC').format(
                         lonstr=df[df.attrs['variable_name']].attrs['lon_grid_point'],
                         latstr=df[df.attrs['variable_name']].attrs['lat_grid_point'],
                         index=df.index[0])
-            plt.title(title.format(lonstr=df[df.attrs['variable_name']].attrs['lon_grid_point'],
-                                   latstr=df[df.attrs['variable_name']].attrs['lat_grid_point'],
-                                   index=df.index[0]), loc='left')
-
-    
-        # format the datetime tick mark labels
-        ax.xaxis.set_major_formatter(dates.DateFormatter('%H%M'))
-        ax.set_xlabel('Time (UTC)')
-    
-        plt.savefig(filepath, dpi=150)
+            plt.title(title)
+            
+            plt.savefig(filepath, dpi=150)
 
     return fig
