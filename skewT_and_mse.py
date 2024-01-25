@@ -268,6 +268,7 @@ def skewT_plot(df, pressure, temperature, dewpoint, uwind, vwind,
     skew.plot_barbs(pressure, uwind, vwind)
     skew.plot(lcl_pressure, lcl_temperature, 'ko', label='LCL')
     skew.plot(lfc_pressure, lfc_temperature, 'bo', label='LFC')
+    
     # Additional Skew-T features
     skew.plot_dry_adiabats()
     skew.plot_moist_adiabats()
@@ -316,12 +317,11 @@ def skewT_plot(df, pressure, temperature, dewpoint, uwind, vwind,
     plt.figtext(0.60, 0.40, f'K-INDEX: {kindex:.0f~P}', weight='bold', fontsize=15,
                 color='black', ha='left')
     
-    #plot the MSE
+    # Save the figure
     plt.savefig(filepath, dpi=150)
-    plt.close()
-    print(f"Skew-T plot saved as: {filepath}")
 
     return fig
+
 
 def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
     """
@@ -361,9 +361,7 @@ def mse_plot(df,pressure,temperature,water_vapor,zlev,filepath =None):
                        zlev.values, h0_std=2000, ensemble_size=20,
                        ent_rate=np.arange(0, 2, 0.05), entrain=False)
     
-    #plot the Mse
+    # Save the figure
     plt.savefig(filepath, dpi=150)
-    plt.close()
-    print(f"MSE plot saved as: {filepath}")
-
+    
     return fig
